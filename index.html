@@ -109,6 +109,13 @@
   <small class="text-muted">Pembaruan data: <span id="updateData">-</span></small>
 </section>
 
+<div class="mb-3 text-right">
+  <button onclick="window.print()" class="btn btn-primary btn-sm">
+    Cetak Laporan PDF
+  </button>
+</div>
+
+
 <!-- PRIORITAS INTERVENSI -->
 <section id="prioritas" class="container py-5">
   <h2>Prioritas Intervensi Sosial (Desil 1–2)</h2>
@@ -174,10 +181,7 @@
     <button onclick="verify()">Verifikasi</button>
     <div id="result"></div>
   </div>
-  <button class="btn btn-primary d-print-none" onclick="downloadPDF()">
-  Unduh Dokumen (PDF)
-</button>
-</section>
+  </section>
 
 <!-- WILAYAH -->
 <section id="wilayah" class="container py-5">
@@ -339,6 +343,7 @@ async function verify() {
 
 </body>
 </html>
+
 
 
 

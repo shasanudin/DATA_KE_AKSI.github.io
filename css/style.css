@@ -117,27 +117,41 @@ footer {
   background-color: #28a745; /* hijau */
 }
 
+/* =========================
+   MODE CETAK / PDF
+========================= */
 @media print {
+
+  body {
+    font-size: 12px;
+  }
+
   nav,
-  footer,
   .navbar,
-  .btn,
-  #aplikasi textarea,
-  #aplikasi button {
+  button,
+  footer {
     display: none !important;
   }
 
-  body {
-    font-size: 12pt;
+  h1, h2, h3, h4 {
+    color: #000 !important;
   }
 
-  .hero {
-    padding: 0;
+  table {
+    font-size: 11px;
+  }
+
+  .badge-risiko {
+    border: 1px solid #000;
+    color: #000 !important;
+    background: none !important;
   }
 
   .container {
-    max-width: 100%;
+    max-width: 100% !important;
   }
 }
+
+
 
 

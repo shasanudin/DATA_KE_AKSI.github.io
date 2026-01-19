@@ -117,3 +117,27 @@ footer {
   background-color: #28a745; /* hijau */
 }
 
+@media print {
+  nav,
+  footer,
+  .navbar,
+  .btn,
+  #aplikasi textarea,
+  #aplikasi button {
+    display: none !important;
+  }
+
+  body {
+    font-size: 12pt;
+  }
+
+  .hero {
+    padding: 0;
+  }
+
+  .container {
+    max-width: 100%;
+  }
+}
+
+

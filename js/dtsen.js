@@ -1,4 +1,3 @@
-console.log("DTSEN JS LOADED");
 fetch("data/dtsen.json")
   .then(response => {
     if (!response.ok) {
@@ -141,6 +140,7 @@ fetch("data/dtsen.json")
       `;
     }
   });
+
 
 
 

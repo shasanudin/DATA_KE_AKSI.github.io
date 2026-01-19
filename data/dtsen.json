@@ -6,75 +6,102 @@
 
   "wilayah": [
     {
-      "nama": "Babakan",
-      "total_kk": 920,
-      "desil": [14, 12, 10, 9, 11, 13, 12, 8, 7, 4]
-    },
-    {
-      "nama": "Gegunung",
-      "total_kk": 780,
-      "desil": [15, 13, 11, 10, 12, 11, 9, 8, 7, 4]
-    },
-    {
-      "nama": "Kaliwadas",
-      "total_kk": 640,
-      "desil": [18, 14, 12, 10, 10, 9, 8, 7, 6, 6]
-    },
-    {
-      "nama": "Kemantren",
-      "total_kk": 860,
-      "desil": [12, 11, 10, 9, 13, 14, 12, 9, 6, 4]
-    },
-    {
-      "nama": "Kenanga",
-      "total_kk": 1050,
-      "desil": [10, 9, 10, 11, 14, 15, 13, 8, 6, 4]
-    },
-    {
-      "nama": "Pasalakan",
-      "total_kk": 720,
-      "desil": [17, 14, 12, 10, 11, 10, 9, 7, 6, 4]
-    },
-    {
-      "nama": "Pejambon",
-      "total_kk": 690,
-      "desil": [16, 13, 11, 10, 12, 11, 9, 8, 6, 4]
-    },
-    {
-      "nama": "Perbutulan",
-      "total_kk": 830,
-      "desil": [14, 12, 11, 10, 12, 13, 11, 9, 6, 2]
-    },
-    {
-      "nama": "Sendang",
-      "total_kk": 760,
-      "desil": [15, 13, 12, 10, 11, 11, 10, 8, 6, 4]
-    },
-    {
+      "kode": "3209031001",
       "nama": "Sumber",
+      "jenis": "Kelurahan",
       "total_kk": 1200,
       "desil": [9, 8, 9, 10, 15, 16, 14, 9, 7, 3]
     },
     {
+      "kode": "3209032001",
+      "nama": "Babakan",
+      "jenis": "Desa",
+      "total_kk": 920,
+      "desil": [14, 12, 10, 9, 11, 13, 12, 8, 7, 4]
+    },
+    {
+      "kode": "3209032002",
+      "nama": "Gegunung",
+      "jenis": "Desa",
+      "total_kk": 780,
+      "desil": [15, 13, 11, 10, 12, 11, 9, 8, 7, 4]
+    },
+    {
+      "kode": "3209032003",
+      "nama": "Kaliwadas",
+      "jenis": "Desa",
+      "total_kk": 640,
+      "desil": [18, 14, 12, 10, 10, 9, 8, 7, 6, 6]
+    },
+    {
+      "kode": "3209032004",
+      "nama": "Kemantren",
+      "jenis": "Desa",
+      "total_kk": 860,
+      "desil": [12, 11, 10, 9, 13, 14, 12, 9, 6, 4]
+    },
+    {
+      "kode": "3209032005",
+      "nama": "Kenanga",
+      "jenis": "Desa",
+      "total_kk": 1050,
+      "desil": [10, 9, 10, 11, 14, 15, 13, 8, 6, 4]
+    },
+    {
+      "kode": "3209032006",
+      "nama": "Pasalakan",
+      "jenis": "Desa",
+      "total_kk": 720,
+      "desil": [17, 14, 12, 10, 11, 10, 9, 7, 6, 4]
+    },
+    {
+      "kode": "3209032007",
+      "nama": "Pejambon",
+      "jenis": "Desa",
+      "total_kk": 690,
+      "desil": [16, 13, 11, 10, 12, 11, 9, 8, 6, 4]
+    },
+    {
+      "kode": "3209032008",
+      "nama": "Perbutulan",
+      "jenis": "Desa",
+      "total_kk": 830,
+      "desil": [14, 12, 11, 10, 12, 13, 11, 9, 6, 2]
+    },
+    {
+      "kode": "3209032009",
+      "nama": "Sendang",
+      "jenis": "Desa",
+      "total_kk": 760,
+      "desil": [15, 13, 12, 10, 11, 11, 10, 8, 6, 4]
+    },
+    {
+      "kode": "3209032010",
       "nama": "Tukmudal",
+      "jenis": "Desa",
       "total_kk": 880,
       "desil": [13, 12, 11, 10, 13, 14, 12, 9, 4, 2]
     },
     {
+      "kode": "3209032011",
       "nama": "Watubelah",
+      "jenis": "Desa",
       "total_kk": 810,
       "desil": [14, 13, 12, 11, 12, 11, 9, 8, 6, 4]
     },
     {
+      "kode": "3209032012",
       "nama": "Matangaji",
+      "jenis": "Desa",
       "total_kk": 560,
       "desil": [19, 15, 13, 11, 10, 9, 8, 7, 5, 3]
     },
     {
+      "kode": "3209032013",
       "nama": "Sidawangi",
+      "jenis": "Desa",
       "total_kk": 600,
       "desil": [18, 15, 13, 11, 10, 9, 8, 7, 5, 4]
     }
   ]
 }
-

@@ -202,5 +202,18 @@ function renderWilayah(idx, data) {
       });
     });
 </script>
+<script>
+fetch('data/dtsen.json')
+  .then(res => res.json())
+  .then(data => {
+    // ... kode inisialisasi select ...
+    
+    // Panggil render pertama kali untuk wilayah pertama
+    renderWilayah(0, data); 
+    
+    // Event listener saat user mengganti wilayah
+    select.addEventListener('change', e => renderWilayah(e.target.value, data));
+  });
+</script>
 </body>
 </html>

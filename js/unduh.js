@@ -1,27 +1,29 @@
-function prepareQR(id, msg) {
+async function prepareQR(id, msg) {
     const qrDiv = document.getElementById("qrcode");
-    qrDiv.innerHTML = ""; 
+    qrDiv.innerHTML = "Menandatangani...";
 
-    // Tampilkan pesan yang harus ditanda tangani di console (F12) untuk memudahkan
-    console.log("ID Laporan:", id);
-    console.log("Pesan (MSG):", msg);
+    try {
+        // Panggil API Server untuk minta Signature
+        const response = await fetch('http://localhost:3000/api/sign-report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id, msg: msg })
+        });
 
-    // Munculkan kotak input untuk Signature
-    const userSignature = prompt("MASUKKAN SIGNATURE HEX DARI SIGNER TOOL:", "");
+        const signedData = await response.json();
 
-    if (userSignature) {
-        const finalPayload = { id: id, msg: msg, sig: userSignature.trim() };
+        // Buat QR Code dari hasil respons Server
+        qrDiv.innerHTML = "";
         new QRCode(qrDiv, {
-            text: JSON.stringify(finalPayload),
-            width: 100, height: 100,
+            text: JSON.stringify(signedData),
+            width: 110,
+            height: 110,
             correctLevel: QRCode.CorrectLevel.H
         });
-        alert("QR Code Sah Terbentuk!");
-    } else {
-        alert("QR Tanpa Tanda Tangan (Status: DRAFT)");
-        new QRCode(qrDiv, {
-            text: JSON.stringify({id: id, msg: msg, sig: "UNSIGNED"}),
-            width: 100, height: 100
-        });
+
+        console.log("Otentikasi Berhasil: Dokumen Terkunci.");
+    } catch (err) {
+        qrDiv.innerHTML = "Gagal koneksi ke Security Server";
+        console.error(err);
     }
 }

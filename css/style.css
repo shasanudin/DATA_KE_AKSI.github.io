@@ -85,17 +85,18 @@ footer {
 }
 
 /* ===== RESPONSIVE ===== */
-/* Styling untuk status pada tabel */
 .badge-risiko {
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
-    color: white;
+  padding: 5px 10px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
 }
-.prioritas-tinggi { background-color: #e74c3c !important; } /* Merah */
-.prioritas-sedang { background-color: #f39c12 !important; } /* Oranye */
-.prioritas-rendah { background-color: #27ae60 !important; } /* Hijau */
+
+.prioritas-tinggi { background: #dc3545; }
+.prioritas-sedang { background: #ffc107; color: #000; }
+.prioritas-rendah { background: #28a745; }
+
 
 /* =========================
    MODE CETAK / PDF
@@ -166,6 +167,7 @@ footer {
         .news-container { box-shadow: none; border: none; padding: 0; }
     }
 </style>
+
 
 
 

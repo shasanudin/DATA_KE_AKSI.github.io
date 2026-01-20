@@ -2,13 +2,16 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Laporan Bulanan DTSEN Kecamatan Sumber</title>
+<title>Laporan Bulanan DTSEN TKSK dan Puskesos Kecamatan Sumber</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
 <style>
 body { font-family: "Times New Roman", serif; }
@@ -25,6 +28,13 @@ canvas { max-width: 100%; height: 300px !important; }
 
 <body>
 
+  <div class="no-print">
+    <div>
+      <h2>Arsip Bulanan DTSEN</h2>
+      <p class="text-muted">Riwayat data kesejahteraan sosial Kecamatan Sumber per periode.</p>
+    </div>
+    <a href="index.html" class="btn btn-outline-secondary btn-sm">Kembali</a>
+  </div>
 <div class="no-print">
 <button class="btn btn-danger" onclick="exportPDF()">Export PDF</button>
 </div>
@@ -34,7 +44,8 @@ canvas { max-width: 100%; height: 300px !important; }
 <!-- ================= COVER ================= -->
 <div class="page">
 <header>
-<img src="assets/img/logo/logo-pemda.png">
+<img src="assets/img/logo/logo-tksk.png" alt="TKSK">
+<img src="assets/img/logo/logo-puskesos.png" alt="Puskesos" class="ml-2">
 <h4 class="font-weight-bold mt-3">LAPORAN BULANAN</h4>
 <h4 class="font-weight-bold">DATA TERPADU SOSIAL EKONOMI NASIONAL (DTSEN)</h4>
 <p>Kecamatan <span id="kecamatan"></span><br>
@@ -92,7 +103,21 @@ dan rekomendasi kebijakan pengentasan kemiskinan berbasis Data DTSEN.
 </ol>
 </div>
 
+<div class="page">
+<h5>Dashboard Interaktif DTSEN</h5>
+
+<label>Filter Desil Maksimal: <strong id="labelDesil">2</strong></label>
+<input type="range" min="1" max="10" value="2" id="desilSlider" class="w-100">
+
+<canvas id="chartDashboard" class="mt-4"></canvas>
+</div>
+
 <!-- ================= RAB ================= -->
+<div class="page">
+<h5>Peta Heatmap Kemiskinan (Desil 1–2)</h5>
+<div id="map" style="height:500px;"></div>
+</div>
+ 
 <div class="page">
 <h5>Rencana Anggaran Biaya (RAB) Prioritas Tinggi D1–D2</h5>
 <table class="table table-bordered table-sm">
@@ -120,24 +145,29 @@ dan rekomendasi kebijakan pengentasan kemiskinan berbasis Data DTSEN.
 
 <!-- ================= TTD ================= -->
 <div class="page">
-<div class="row text-center mt-5">
-<div class="col-6">
-<p>Mengetahui,<br>Camat Sumber</p>
-<div class="ttd"></div>
-<p><strong>(............................)</strong><br>
-NIP. ............................</p>
+<div class="row text-center mt-5 align-items-start">
+
+  <!-- CAMAT -->
+  <div class="col-6">
+    <p>Mengetahui,<br>Camat Sumber</p>
+    <div class="ttd"></div>
+    <p><strong>(............................)</strong><br>
+    NIP. ............................</p>
+  </div>
+
+  <!-- TKSK -->
+  <div class="col-6 d-flex flex-column align-items-center">
+    <p id="tanggalTTD" class="mb-2"></p>
+    <p class="mb-2">TKSK Kecamatan Sumber</p>
+
+    <div id="qrcode" style="width:120px;height:120px;"></div>
+
+    <p class="mt-2 font-weight-bold">Shidiq Hasanudin, S.IP</p>
+  </div>
+
+</div>
 </div>
 
-<div class="col-6">
-<p id="tanggalTTD"></p>
-<p>TKSK Kecamatan Sumber</p>
-<div id="qrcode"></div>
-<p><strong>Shidiq Hasanudin, S.IP</strong></p>
-</div>
-</div>
-</div>
-
-</div>
 
 <script>
 fetch("data/dtsen.json").then(r=>r.json()).then(data=>{
@@ -224,6 +254,80 @@ function exportPDF(){
  }).from(document.getElementById("laporan")).save();
 }
 </script>
+<script>
+fetch("data/dtsen.json")
+.then(r=>r.json())
+.then(data=>{
 
+const map = L.map('map').setView([-6.759,108.48], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution:'© OpenStreetMap'
+}).addTo(map);
+
+const heatData = [];
+
+data.wilayah.forEach(w=>{
+  const d12 = w.desil[0] + w.desil[1];
+  heatData.push([w.lat, w.lng, d12]);
+});
+
+L.heatLayer(heatData,{
+  radius:35,
+  blur:25,
+  maxZoom:13
+}).addTo(map);
+
+});
+</script>
+<script>
+let dashChart;
+
+fetch("data/dtsen.json")
+.then(r=>r.json())
+.then(data=>{
+
+const slider = document.getElementById("desilSlider");
+const label = document.getElementById("labelDesil");
+
+function updateChart(maxDesil){
+  const labels = [];
+  const values = [];
+
+  data.wilayah.forEach(w=>{
+    let total = 0;
+    for(let i=0;i<maxDesil;i++) total += w.desil[i];
+    labels.push(w.nama);
+    values.push(total);
+  });
+
+  if(dashChart) dashChart.destroy();
+
+  dashChart = new Chart(chartDashboard,{
+    type:"bar",
+    data:{
+      labels,
+      datasets:[{
+        data:values,
+        backgroundColor:"#28a745"
+      }]
+    },
+    options:{
+      plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true}}
+    }
+  });
+}
+
+slider.addEventListener("input",()=>{
+  label.innerText = slider.value;
+  updateChart(Number(slider.value));
+});
+
+updateChart(2);
+
+});
+</script>
+ 
 </body>
 </html>

@@ -89,81 +89,24 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
-    let publicKeyData = null;
+  // Logika verifikasi tetap menggunakan jsrsasign di sisi klien
+async function onScanSuccess(decodedText) {
+    const payload = JSON.parse(decodedText);
+    const keyRes = await fetch('js/public_key.json');
+    const keyData = await keyRes.json();
 
-    // 1. Ambil Metadata dari public_key.json
-    async function loadKey() {
-        try {
-            const res = await fetch('js/public_key.json');
-            publicKeyData = await res.json();
-        } catch (err) {
-            console.error("Gagal memuat Public Key:", err);
-            alert("Error: File /js/public_key.json tidak ditemukan!");
-        }
+    const sig = new KJUR.crypto.Signature({"alg": "SHA256withECDSA"});
+    sig.init(keyData.pem);
+    sig.updateString(payload.msg);
+    
+    if (sig.verify(payload.sig)) {
+        renderValidUI(payload, keyData);
+    } else {
+        renderInvalidUI();
     }
-
-    // 2. Setup Scanner
-    const html5QrCode = new Html5Qrcode("reader");
-    const qrConfig = { fps: 15, qrbox: { width: 250, height: 250 } };
-
-    async function startScanner() {
-        await loadKey();
-        html5QrCode.start({ facingMode: "environment" }, qrConfig, onScanSuccess)
-            .catch(err => console.error("Kamera Error:", err));
-    }
-
-    // 3. Logika Verifikasi
-    function onScanSuccess(decodedText) {
-        html5QrCode.stop();
-        document.getElementById('reader').style.display = 'none';
-        
-        const resultBox = document.getElementById('result');
-        const icon = document.getElementById('statusIcon');
-        const title = document.getElementById('statusTitle');
-        const detail = document.getElementById('statusDetail');
-        const signerName = document.getElementById('signerName');
-        const signerJob = document.getElementById('signerJob');
-        const docID = document.getElementById('docID');
-
-        resultBox.style.display = 'block';
-
-        try {
-            const payload = JSON.parse(decodedText);
-            
-            // Verifikasi Signature ECDSA P-256
-            const sig = new KJUR.crypto.Signature({"alg": "SHA256withECDSA"});
-            sig.init(publicKeyData.pem);
-            sig.updateString(payload.msg);
-            
-            const isValid = sig.verify(payload.sig);
-
-            if (isValid) {
-                resultBox.className = "result-box valid";
-                icon.innerHTML = "✅";
-                title.innerText = "DOKUMEN ASLI";
-                
-                // Isi Data dari public_key.json
-                signerName.innerText = publicKeyData.pemilik;
-                signerJob.innerText = publicKeyData.jabatan;
-                
-                // Isi Data dari QR
-                docID.innerText = payload.id;
-                detail.innerText = payload.msg;
-            } else {
-                throw new Error("Invalid");
-            }
-        } catch (e) {
-            resultBox.className = "result-box invalid";
-            icon.innerHTML = "❌";
-            title.innerText = "DATA PALSU";
-            document.getElementById('statusContent').style.display = 'none';
-            detail.innerHTML = "Tanda tangan digital tidak cocok. Data telah dimodifikasi atau bukan berasal dari otoritas TKSK Sumber.";
-        }
-    }
-
-    // Inisialisasi
-    startScanner();
-
+}
+</script>
+<script>
     // Load Navbar
     fetch('navbar.html').then(r => r.text()).then(html => {
         document.getElementById('navbar').innerHTML = html;

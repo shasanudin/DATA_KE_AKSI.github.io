@@ -145,6 +145,21 @@ footer {
     transition: 0.2s;
 }
 
+<style>
+  .hero { 
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); 
+    color: white; 
+    padding: 100px 0; /* Menambah padding atas bawah */
+    min-height: 50vh; /* Minimal setengah tinggi layar agar teks leluasa di tengah */
+    display: flex;
+    align-items: center;
+  }
+  
+  .lead {
+    max-width: 700px; /* Membatasi lebar agar teks tidak terlalu melar ke samping */
+    line-height: 1.6;
+  }
+</style>
 
 
 

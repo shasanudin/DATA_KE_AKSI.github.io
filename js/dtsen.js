@@ -74,7 +74,12 @@ fetch("data/dtsen.json")
        TABEL PRIORITAS + RISIKO
     ========================= */
 
+    fetch('data/dtsen.json')
+  .then(res => res.json())
+  .then(data => {
     const tbody = document.getElementById("tabelPrioritas");
+    if (!tbody) return; // Keluar jika bukan di halaman prioritas
+
     tbody.innerHTML = "";
 
     const hasil = data.wilayah.map(w => {
@@ -90,11 +95,10 @@ fetch("data/dtsen.json")
       };
     });
 
-    // sort descending
+    // Urutkan dari total tertinggi (Desil 1 + Desil 2)
     hasil.sort((a, b) => b.total - a.total);
 
     hasil.forEach((w, i) => {
-
       let status = "";
       let kelas = "";
 
@@ -114,9 +118,9 @@ fetch("data/dtsen.json")
           <td>${i + 1}</td>
           <td>${w.nama}</td>
           <td>${w.jenis}</td>
-          <td>${w.d1}</td>
-          <td>${w.d2}</td>
-          <td><strong>${w.total}</strong></td>
+          <td>${w.d1}%</td>
+          <td>${w.d2}%</td>
+          <td><strong>${w.total}%</strong></td>
           <td>
             <span class="badge-risiko ${kelas}">
               ${status}
@@ -125,19 +129,12 @@ fetch("data/dtsen.json")
         </tr>
       `;
     });
-
   })
   .catch(error => {
     console.error("Gagal load data DTSEN:", error);
     const tbody = document.getElementById("tabelPrioritas");
     if (tbody) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="7" class="text-center text-danger">
-            Gagal memuat data DTSEN
-          </td>
-        </tr>
-      `;
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Gagal memuat data</td></tr>`;
     }
   });
 

@@ -1,5 +1,7 @@
 {
-"id": "DTSEN-SUMBER-2026",
-"msg": "UPDATE 2026 BULAN JANUARI",
-"sig": "3044022056e816a127cb8afe7063f5c6bc38b63755cb7e4ec866a44e53cf7491052c598a02206dcbfd555331b3c1fe96853b36af1cd281575e83fe76f189ca817f217a4aa912"
+  "pem": "-----BEGIN PUBLIC KEY-----MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEzzmj3tgm7GPSL4uNBnIBJAickAkkKJPSoGQk0G8vqCjwMz6N3GZWJn3rBbbLJps4tUtKzq7+8cfLZfdzxoxASA==-----END PUBLIC KEY-----",
+  "algoritma": "ECDSA-secp256r1-SHA256",
+  "pemilik": "Shidiq Hasanudin, S.IP",
+  "jabatan": "TKSK Kecamatan Sumber",
+  "berlaku_sampai": "2028-12-31"
 }

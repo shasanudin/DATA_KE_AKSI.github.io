@@ -168,6 +168,15 @@ footer {
     }
 </style>
 
+<style>
+@media print {
+  .col-print-6 {
+    width: 50%;
+    float: left;
+  }
+}
+</style>
+
 
 
 

@@ -1,5 +1,5 @@
 {
-  "id": "UNIK-ID-LAPORAN",
-  "msg": "ISI-LAPORAN-YANG-AKAN-DIVALIDASI",
-  "sig": "HASIL-SIGNATURE-DARI-PRIVATE-KEY"
+  "id": "HASH-123",
+  "msg": "Kec-Sumber-3301",
+  "sig": "3045022100..." 
 }

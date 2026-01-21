@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://shasanudin.github.io/DATA_KE_AKSI/sitemap.xml

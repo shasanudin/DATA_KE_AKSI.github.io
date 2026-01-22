@@ -177,6 +177,22 @@ footer {
 }
 </style>
 
+/* Animasi Typing */
+.typing-text::after {
+  content: '|';
+  animation: blink 0.7s infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Style Tambahan Kontak di Beranda */
+.contact-brief { background-color: #ffffff; border-left: 5px solid #007bff; }
+.icon-circle { 
+    width: 50px; height: 50px; background: #e7f1ff; 
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #007bff; font-size: 20px;
+}
 
 
 

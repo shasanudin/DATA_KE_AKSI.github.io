@@ -16,7 +16,7 @@
             --dark-bg: #f4f7f6;
         }
 
-        /* UI Style (Screen Only) */
+        /* Tampilan Layar (Screen Only) */
         body { 
             background-color: var(--dark-bg); 
             font-family: 'Inter', sans-serif; 
@@ -32,14 +32,13 @@
         .control-panel {
             background: white;
             border-radius: 15px;
-            border: none;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             padding: 25px;
             position: relative;
             z-index: 10;
         }
 
-        /* Paper Style */
+        /* Area Kertas (Kertas A4) */
         .paper {
             background: white;
             width: 210mm;
@@ -47,27 +46,44 @@
             padding: 20mm;
             margin: 30px auto;
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            font-family: "Times New Roman", Times, serif; /* Kembali ke font formal untuk cetak */
+            font-family: "Times New Roman", Times, serif;
             color: #000;
         }
 
-        .kop-surat { 
-            border-bottom: 3px solid #000; 
-            margin-bottom: 5px; 
-            padding-bottom: 10px; 
-        }
-        .kop-line { border-bottom: 1px solid #000; margin-bottom: 20px; }
-        
-        .logo-kop { height: 85px; object-fit: contain; }
-        
-        .qr-box { 
-            border: 1px solid #eee; 
-            padding: 8px; 
-            display: inline-block; 
-            background: #fff;
+        /* Perbaikan Kop Surat agar Logo tidak terpotong */
+        .kop-surat-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 2px;
         }
 
-        /* ATURAN CETAK */
+        .logo-box {
+            width: 90px;
+            flex-shrink: 0;
+        }
+
+        .logo-kop {
+            width: 100%;
+            height: 85px;
+            object-fit: contain;
+        }
+
+        .teks-kop {
+            text-align: center;
+            flex-grow: 1;
+            padding: 0 10px;
+        }
+
+        .kop-line { 
+            border-bottom: 1px solid #000; 
+            margin-top: 2px; 
+            margin-bottom: 20px; 
+        }
+
+        /* ATURAN CETAK (Print Rules) */
         @media print {
             body { background: white !important; }
             .no-print, #navbar, .hero-print, .control-panel, header { display: none !important; }
@@ -75,19 +91,17 @@
                 margin: 0 !important; 
                 box-shadow: none !important; 
                 width: 100% !important; 
-                padding: 10mm !important;
+                padding: 15mm !important;
             }
             @page { size: A4; margin: 0; }
         }
 
         .btn-generate {
             background: var(--primary);
-            border: none;
             font-weight: 600;
             border-radius: 8px;
-            transition: all 0.3s;
+            transition: 0.3s;
         }
-        .btn-generate:hover { background: var(--secondary); transform: translateY(-2px); }
     </style>
 </head>
 <body>
@@ -100,7 +114,7 @@
                 <img src="assets/img/logo/logo-puskesos.png" alt="Puskesos" height="45" class="ml-2 border-left pl-2">
             </div>
             <div class="col-md-6 text-right">
-                <span class="badge badge-primary px-3 py-2">Sistem Laporan Digital</span>
+                <span class="badge badge-primary px-3 py-2">Sistem Laporan Resmi</span>
             </div>
         </div>
     </div>
@@ -110,8 +124,8 @@
 
 <section class="hero-print no-print">
     <div class="container text-center">
-        <h2 class="font-weight-bold">Panel Dokumen Resmi</h2>
-        <p class="opacity-75">Ekspor data DTSEN ke dalam format PDF standar laporan pemerintah.</p>
+        <h2 class="font-weight-bold">Cetak Dokumen DTSEN</h2>
+        <p class="opacity-75">Hasilkan laporan resmi dalam format PDF standar pemerintah.</p>
     </div>
 </section>
 
@@ -119,11 +133,11 @@
     <div class="control-panel">
         <div class="row align-items-end">
             <div class="col-md-4">
-                <label class="small font-weight-bold text-muted">JENIS LAPORAN</label>
+                <label class="small font-weight-bold text-muted">TIPE LAPORAN</label>
                 <select id="tipeLaporan" class="form-control form-control-lg custom-select">
-                    <option value="agregat">1. Agregasi Kecamatan (Total)</option>
-                    <option value="prioritas">2. Daftar Prioritas (Ranking D1-2)</option>
-                    <option value="wilayah">3. Laporan Per Kelurahan/Desa</option>
+                    <option value="agregat">Agregasi Kecamatan</option>
+                    <option value="prioritas">Daftar Prioritas (D1-2)</option>
+                    <option value="wilayah">Detail Per Desa/Kelurahan</option>
                 </select>
             </div>
             <div class="col-md-4" id="selectWilayahContainer" style="display:none;">
@@ -131,10 +145,10 @@
                 <select id="wilayahSelect" class="form-control form-control-lg custom-select"></select>
             </div>
             <div class="col-md-4 mt-3 mt-md-0 text-right">
-                <button onclick="generateReport()" class="btn btn-primary btn-lg px-4 btn-generate">
+                <button onclick="generateReport()" class="btn btn-primary btn-lg btn-generate">
                     <i class="fas fa-sync-alt mr-2"></i>Generate
                 </button>
-                <button onclick="window.print()" class="btn btn-dark btn-lg px-4 shadow-sm">
+                <button onclick="window.print()" class="btn btn-dark btn-lg shadow-sm">
                     <i class="fas fa-file-pdf mr-2"></i>Cetak PDF
                 </button>
             </div>
@@ -143,40 +157,43 @@
 </div>
 
 <div class="paper" id="cetakArea">
-    <div class="kop-surat">
-        <div class="row align-items-center text-center">
-            <div class="col-2"><img src="assets/img/logo/logo-tksk.png" class="logo-kop"></div>
-            <div class="col-8">
-                <h6 class="mb-0">TENAGA KESEJAHTERAAN SOSIAL KECAMATAN (TKSK)</h6>
-                <h5 class="font-weight-bold mb-0">FORUM PUSKESOS KECAMATAN SUMBER</h5>
-                <h3 class="font-weight-bold mb-0" style="color: #000;">DARI DATA KE AKSI</h3>
-                <p class="mb-0 small" style="font-family: Arial, sans-serif;">Sekretariat: Jl. Sunan Drajat No. 16, Kec. Sumber, Kab. Cirebon 45611</p>
-                <p class="mb-0 small" style="font-family: Arial, sans-serif;">Email: tksksumber@gmail.com | WhatsApp: 0882-1494-0995</p>
-            </div>
-            <div class="col-2"><img src="assets/img/logo/logo-puskesos.png" class="logo-kop"></div>
+    <div class="kop-surat-container">
+        <div class="logo-box">
+            <img src="assets/img/logo/logo-tksk.png" class="logo-kop">
+        </div>
+        
+        <div class="teks-kop">
+            <h6 style="font-size: 14px; margin-bottom: 2px;">TENAGA KESEJAHTERAAN SOSIAL KECAMATAN (TKSK)</h6>
+            <h5 class="font-weight-bold" style="font-size: 16px; margin-bottom: 2px;">FORUM PUSKESOS KECAMATAN SUMBER</h5>
+            <h2 class="font-weight-bold" style="color: #000; font-size: 26px; margin: 4px 0;">DARI DATA KE AKSI</h2>
+            <p class="mb-0" style="font-size: 11px; font-family: Arial, sans-serif;">Sekretariat: Jl. Sunan Drajat No. 16, Kec. Sumber, Kab. Cirebon 45611</p>
+            <p class="mb-0" style="font-size: 11px; font-family: Arial, sans-serif;">Email: tksksumber@gmail.com | WhatsApp: 0882-1494-0995</p>
+        </div>
+
+        <div class="logo-box">
+            <img src="assets/img/logo/logo-puskesos.png" class="logo-kop" style="margin-left: auto; display: block;">
         </div>
     </div>
     <div class="kop-line"></div>
 
     <div class="text-center mb-4">
         <h5 id="judulLaporan" class="font-weight-bold text-uppercase" style="text-decoration: underline;">LAPORAN AGREGASI DTSEN KECAMATAN</h5>
-        <p class="mb-0">Nomor: 460 / <span id="hashNomor">...</span> / TKSK / 2026</p>
+        <p class="mb-0">Nomor: 460 / <span id="hashNomor">...</span> / TKSK-SBR / 2026</p>
         <p>Periode Data: <span id="periodeText">-</span></p>
     </div>
 
-    <div id="kontenData" style="min-height: 400px;">
-        <div class="text-center py-5 text-muted">
-            <i class="fas fa-file-invoice fa-3x mb-3"></i>
-            <p>Silahkan pilih tipe laporan dan klik tombol "Generate" untuk memuat data.</p>
+    <div id="kontenData" style="min-height: 420px;">
+        <div class="text-center py-5 text-muted no-print">
+            <p>Data laporan akan muncul di sini setelah klik "Generate".</p>
         </div>
     </div>
 
     <div class="row mt-5">
         <div class="col-7">
-            <div style="border: 1px dashed #ccc; padding: 10px; border-radius: 5px; font-size: 11px; font-family: Arial, sans-serif;">
-                <strong>Catatan Verifikasi:</strong><br>
-                Dokumen ini dihasilkan secara digital oleh Sistem Informasi "Dari Data Ke Aksi". 
-                Informasi yang tertera adalah benar sesuai database DTSEN Kecamatan Sumber pada saat dokumen ini dicetak.
+            <div style="border: 1px solid #eee; padding: 10px; border-radius: 5px; font-size: 11px; font-family: Arial, sans-serif; background: #fafafa;">
+                <strong>Verifikasi Sistem:</strong><br>
+                Laporan ini valid dan dihasilkan otomatis oleh database DTSEN Kecamatan Sumber. 
+                Kode pos operasional resmi: <strong>45611</strong>.
             </div>
         </div>
         <div class="col-5 text-center">
@@ -184,11 +201,11 @@
             <p class="mb-4 font-weight-bold">TKSK Kecamatan Sumber,</p>
             
             <div class="mb-2">
-                <div id="qrcode" class="qr-box shadow-sm"></div>
+                <div id="qrcode" class="qr-box shadow-sm mx-auto"></div>
             </div>
             
             <p class="font-weight-bold mb-0" style="text-decoration: underline;">SHIDIQ HASANUDIN, S.IP</p>
-            <small>ID Verifikasi: <span id="hashID" class="text-uppercase">-</span></small>
+            <small>ID: <span id="hashID" class="text-uppercase">-</span></small>
         </div>
     </div>
 </div>
@@ -196,14 +213,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="js/unduh.js"></script> 
 <script>
-    // Load Navbar
+    // Navbar
     fetch('navbar.html').then(r => r.text()).then(h => document.getElementById('navbar').innerHTML = h);
 
-    // Otomatis isi tanggal sekarang
+    // Set Tanggal
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('tglSekarang').innerText = new Date().toLocaleDateString('id-ID', options);
     
-    // Generate Hash Acak untuk Nomor Surat Sederhana
+    // Nomor Surat Acak
     document.getElementById('hashNomor').innerText = Math.floor(100 + Math.random() * 900);
 </script>
     

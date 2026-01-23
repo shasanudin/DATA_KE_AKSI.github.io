@@ -34,7 +34,7 @@
             font-family: "Times New Roman", Times, serif; color: #000;
         }
 
-        /* Kop Surat Flexbox (Anti Terpotong) */
+        /* Kop Surat */
         .kop-surat-container {
             display: flex; align-items: center; justify-content: space-between;
             border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 2px;
@@ -44,14 +44,8 @@
         .teks-kop { text-align: center; flex-grow: 1; padding: 0 10px; }
         .kop-line { border-bottom: 1px solid #000; margin-top: 2px; margin-bottom: 20px; }
 
-        /* QR Code Styling */
-        .qr-box { 
-            border: 1px solid #eee; padding: 5px; 
-            background: #fff; display: inline-block;
-        }
-        #qrcode img { margin: 0 auto; } /* Memaksa gambar QR ke tengah */
+        .qr-box { border: 1px solid #eee; padding: 5px; background: #fff; display: inline-block; }
 
-        /* Aturan Cetak */
         @media print {
             body { background: white !important; }
             .no-print, #navbar, .hero-print, .control-panel, header { display: none !important; }
@@ -72,8 +66,6 @@
     </div>
 </header>
 
-<div id="navbar" class="no-print"></div>
-
 <section class="hero-print no-print">
     <div class="container text-center">
         <h2 class="font-weight-bold">Panel Laporan DTSEN</h2>
@@ -84,24 +76,19 @@
 <div class="container no-print mt-5">
     <div class="control-panel">
         <div class="row align-items-end">
-            <div class="col-md-4">
+            <div class="col-md-5">
                 <label class="small font-weight-bold text-muted">JENIS LAPORAN</label>
                 <select id="tipeLaporan" class="form-control form-control-lg">
-                    <option value="agregat">Agregasi Kecamatan</option>
-                    <option value="prioritas">Daftar Prioritas (D1-2)</option>
-                    <option value="wilayah">Detail Desa/Kelurahan</option>
+                    <option value="agregat">Agregasi Seluruh Wilayah</option>
+                    <option value="prioritas">Daftar Prioritas (Kondisi Rumah)</option>
                 </select>
             </div>
-            <div class="col-md-4" id="selectWilayahContainer" style="display:none;">
-                <label class="small font-weight-bold text-muted">PILIH WILAYAH</label>
-                <select id="wilayahSelect" class="form-control form-control-lg"></select>
-            </div>
-            <div class="col-md-4 mt-3 mt-md-0 text-right">
+            <div class="col-md-7 mt-3 mt-md-0 text-right">
                 <button onclick="generateReport()" class="btn btn-primary btn-lg px-4 shadow-sm">
-                    <i class="fas fa-sync-alt mr-2"></i>Generate
+                    <i class="fas fa-sync-alt mr-2"></i>Generate Data
                 </button>
                 <button onclick="window.print()" class="btn btn-dark btn-lg px-4 shadow-sm ml-2">
-                    <i class="fas fa-print mr-2"></i>Cetak
+                    <i class="fas fa-print mr-2"></i>Cetak Ke PDF
                 </button>
             </div>
         </div>
@@ -125,7 +112,7 @@
     <div class="text-center mb-4">
         <h5 id="judulLaporan" class="font-weight-bold text-uppercase" style="text-decoration: underline;">LAPORAN AGREGASI DTSEN KECAMATAN</h5>
         <p class="mb-0">Nomor: 460 / <span id="hashNomor">...</span> / TKSK-SBR / 2026</p>
-        <p>Periode: <span id="periodeText">-</span></p>
+        <p>Tanggal Cetak: <span id="tglSekarang">-</span></p>
     </div>
 
     <div id="kontenData" style="min-height: 400px;">
@@ -135,17 +122,15 @@
         <div class="col-7">
             <div style="border: 1px solid #ddd; padding: 10px; font-size: 11px; font-family: Arial; background: #fcfcfc;">
                 <strong>Sistem Verifikasi Digital:</strong><br>
-                Data ini diambil langsung dari basis data DTSEN Kecamatan Sumber. Keabsahan dokumen dapat diperiksa melalui pemindaian QR Code. Kode Pos: 45611.
+                Dokumen ini dihasilkan secara otomatis oleh Sistem DTSEN. Keabsahan data dapat diverifikasi melalui kode unik dan QR Code terlampir.
             </div>
         </div>
         <div class="col-5 text-center">
-            <p class="mb-1">Sumber, <span id="tglSekarang"></span></p>
+            <p class="mb-1">Sumber, <span id="tglTandaTangan"></span></p>
             <p class="mb-3 font-weight-bold">TKSK Kecamatan Sumber,</p>
-            
             <div class="mb-3 d-flex justify-content-center">
                 <div id="qrcode" class="qr-box shadow-sm"></div>
             </div>
-            
             <p class="font-weight-bold mb-0" style="text-decoration: underline;">SHIDIQ HASANUDIN, S.IP</p>
             <small>ID Verif: <span id="hashID" class="text-uppercase">-</span></small>
         </div>
@@ -154,68 +139,119 @@
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="js/unduh.js"></script> 
+
 <script>
-    // Load Navbar
-    fetch('navbar.html').then(r => r.text()).then(h => document.getElementById('navbar').innerHTML = h);
-
-    // Set Initial Metadata
-    document.getElementById('tglSekarang').innerText = new Date().toLocaleDateString('id-ID', {year:'numeric', month:'long', day:'numeric'});
+    // Inisialisasi Meta Data
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const today = new Date().toLocaleDateString('id-ID', options);
+    document.getElementById('tglSekarang').innerText = today;
+    document.getElementById('tglTandaTangan').innerText = today;
     document.getElementById('hashNomor').innerText = Math.floor(100 + Math.random() * 899);
-    document.getElementById('hashID').innerText = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const uniqueID = Math.random().toString(36).substring(2, 8).toUpperCase();
+    document.getElementById('hashID').innerText = uniqueID;
 
-    // Toggle Wilayah Select based on Report Type
-    document.getElementById('tipeLaporan').addEventListener('change', function() {
-        const container = document.getElementById('selectWilayahContainer');
-        container.style.display = (this.value === 'wilayah') ? 'block' : 'none';
-    });
-
-    // THE FIX: Define the missing function
-    function generateReport() {
+    async function generateReport() {
         const tipe = document.getElementById('tipeLaporan').value;
         const konten = document.getElementById('kontenData');
         const judul = document.getElementById('judulLaporan');
         
-        // Update Title
-        if(tipe === 'agregat') judul.innerText = "LAPORAN AGREGASI DTSEN KECAMATAN";
-        if(tipe === 'prioritas') judul.innerText = "DAFTAR PRIORITAS (D1-D2) KECAMATAN";
-        if(tipe === 'wilayah') judul.innerText = "LAPORAN DETAIL DATA WILAYAH";
+        konten.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div><p>Mengambil data dari dtsen.json...</p></div>';
 
-        // Show Loading
-        konten.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div><p>Memproses data...</p></div>';
+        try {
+            // AMBIL DATA DARI JSON
+            const response = await fetch('dtsen.json');
+            if (!response.ok) throw new Error('File dtsen.json tidak ditemukan');
+            const data = await response.json();
 
-        // Simulate Data Fetching (Replace this with your actual data logic)
-        setTimeout(() => {
-            let html = `
-                <table class="table table-bordered table-sm" style="font-size: 12px;">
-                    <thead class="bg-light text-center">
-                        <tr>
-                            <th>No</th>
-                            <th>Indikator / Wilayah</th>
-                            <th>Total KPM</th>
-                            <th>Status Verivali</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td class="text-center">1</td><td>Kelurahan Sumber</td><td class="text-center">145</td><td class="text-center">Selesai</td></tr>
-                        <tr><td class="text-center">2</td><td>Desa Watubelah</td><td class="text-center">98</td><td class="text-center">Proses</td></tr>
-                    </tbody>
-                </table>
-            `;
-            konten.innerHTML = html;
+            let html = '';
             
-            // Generate QR Code after data loads
-            document.getElementById('qrcode').innerHTML = ""; // Clear old QR
-            new QRCode(document.getElementById("qrcode"), {
-                text: "VERIF-DTSEN-" + document.getElementById('hashNomor').innerText,
-                width: 80,
-                height: 80
-            });
-        }, 800);
+            if (tipe === 'agregat') {
+                judul.innerText = "LAPORAN AGREGASI DATA DTSEN PER WILAYAH";
+                html = renderTableAgregat(data);
+            } else {
+                judul.innerText = "DAFTAR PRIORITAS PENERIMA MANFAAT (D1-D2)";
+                html = renderTablePrioritas(data);
+            }
+
+            konten.innerHTML = html;
+            generateQRCode();
+
+        } catch (error) {
+            konten.innerHTML = `<div class="alert alert-danger">Gagal memuat data: ${error.message}</div>`;
+        }
     }
 
-    // Initial load
+    function renderTableAgregat(data) {
+        // Logika sederhana menghitung jumlah KPM per Desa (Asumsi key: 'desa')
+        const rekap = {};
+        data.forEach(item => {
+            rekap[item.desa] = (rekap[item.desa] || 0) + 1;
+        });
+
+        let rows = '';
+        let no = 1;
+        for (const desa in rekap) {
+            rows += `<tr>
+                <td class="text-center">${no++}</td>
+                <td>${desa}</td>
+                <td class="text-center">${rekap[desa]}</td>
+                <td class="text-center">Terverifikasi</td>
+            </tr>`;
+        }
+
+        return `
+            <table class="table table-bordered table-sm" style="font-size: 12px;">
+                <thead class="bg-light text-center">
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Desa / Kelurahan</th>
+                        <th>Jumlah KPM</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>`;
+    }
+
+    function renderTablePrioritas(data) {
+        // Ambil 10 data pertama sebagai contoh prioritas
+        let rows = '';
+        data.slice(0, 15).forEach((item, index) => {
+            rows += `<tr>
+                <td class="text-center">${index + 1}</td>
+                <td>${item.nama_kpm || item.nama}</td>
+                <td>${item.alamat}</td>
+                <td class="text-center">${item.status_rumah || 'D1'}</td>
+            </tr>`;
+        });
+
+        return `
+            <table class="table table-bordered table-sm" style="font-size: 11px;">
+                <thead class="bg-light text-center">
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Penerima</th>
+                        <th>Alamat</th>
+                        <th>Kondisi</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>`;
+    }
+
+    function generateQRCode() {
+        const qrContainer = document.getElementById('qrcode');
+        qrContainer.innerHTML = ""; 
+        new QRCode(qrContainer, {
+            text: "VALID-SUMBER-" + uniqueID,
+            width: 80,
+            height: 80
+        });
+    }
+
+    // Jalankan saat pertama kali buka
     window.onload = generateReport;
 </script>
+
 </body>
 </html>

@@ -157,7 +157,7 @@
         konten.innerHTML = '<div class="text-center mt-5"><div class="spinner-border text-primary"></div><p>Sinkronisasi Database...</p></div>';
 
         try {
-            const res = await fetch('dtsen.json');
+            const res = await fetch('data/dtsen.json');
             const data = await res.json();
             
             let filteredHtml = '';

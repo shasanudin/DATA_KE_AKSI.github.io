@@ -134,7 +134,7 @@ body { font-family: Inter, sans-serif; background:#f4f7f6; }
 
 <div class="col-md-3 mb-3">
 <div class="card card-custom p-3">
-<p class="small text-muted mb-1">Total KK Miskin (D1–D2)</p>
+<p class="small text-muted mb-1">Total KK Target (D1–D5)</p>
 <div id="totalMiskin" class="stat text-danger">—</div>
 </div>
 </div>
@@ -171,7 +171,10 @@ body { font-family: Inter, sans-serif; background:#f4f7f6; }
 <th>Wilayah</th>
 <th>D1</th>
 <th>D2</th>
-<th>Total Miskin</th>
+<th>D3</th>
+<th>D4</th>
+<th>D5</th>
+<th>Total Target (D1–D5)</th>
 <th>Total Bansos</th>
 <th>Covered</th>
 <th>GAP</th>
@@ -222,52 +225,56 @@ Promise.all([
     let chartCovered = [];
 
     dtsen.wilayah.forEach(w => {
-        let d1 = w.desil[0];
-        let d2 = w.desil[1];
-        let miskin = d1 + d2;
+    let d1 = w.desil[0];
+    let d2 = w.desil[1];
+    let d3 = w.desil[2];
+    let d4 = w.desil[3];
+    let d5 = w.desil[4];
 
-        let match = bansos.wilayah.find(b => b.nama === w.nama);
-        let bansosTotal = match 
-            ? (match.bansos.PKH + match.bansos.BPNT + match.bansos.PBI)
-            : 0;
+    // Target penerima = D1–D5
+    let target = d1 + d2 + d3 + d4 + d5;
 
-        let covered = Math.min(miskin, bansosTotal);
-        let gap = Math.max(0, miskin - bansosTotal);
-        let leakage = Math.max(0, bansosTotal - miskin);
+    let match = bansos.wilayah.find(b => b.nama === w.nama);
+    let bansosTotal = match 
+        ? (match.bansos.PKH + match.bansos.BPNT + match.bansos.PBI)
+        : 0;
 
-        totalMiskin += miskin;
-        totalCovered += covered;
-        totalGap += gap;
-        totalLeakage += leakage;
+    let covered = Math.min(target, bansosTotal);
+    let gap = Math.max(0, target - bansosTotal);
 
-        let status = "Seimbang";
-        if (gap > miskin * 0.2) status = "KRITIS (Kurang Bantuan)";
-        if (leakage > miskin * 0.2) status = "ANOMALI (Potensi Salah Sasaran)";
+    // Leakage = bantuan masuk ke D6–D10
+    let leakage = Math.max(0, bansosTotal - target);
 
-        tableRows.push(`
-        <tr>
-            <td>${w.nama}</td>
-            <td class="text-center">${d1}</td>
-            <td class="text-center">${d2}</td>
-            <td class="text-center font-weight-bold">${miskin}</td>
-            <td class="text-center">${bansosTotal}</td>
-            <td class="text-center text-success">${covered}</td>
-            <td class="text-center text-warning">${gap}</td>
-            <td class="text-center text-primary">${leakage}</td>
-            <td class="font-weight-bold">${status}</td>
-        </tr>`);
+    totalMiskin += target;
+    totalCovered += covered;
+    totalGap += gap;
+    totalLeakage += leakage;
 
-        chartLabels.push(w.nama);
-        chartGap.push(gap);
-        chartCovered.push(covered);
-    });
+    let status = "Seimbang";
+    if (gap > target * 0.2) status = "KRITIS (Kurang Bantuan)";
+    if (leakage > target * 0.2) status = "ANOMALI (Potensi Salah Sasaran)";
 
-    document.getElementById('totalMiskin').innerText = totalMiskin.toLocaleString('id-ID');
-    document.getElementById('covered').innerText = totalCovered.toLocaleString('id-ID');
-    document.getElementById('gap').innerText = totalGap.toLocaleString('id-ID');
-    document.getElementById('leakage').innerText = totalLeakage.toLocaleString('id-ID');
+    tableRows.push(`
+    <tr>
+        <td>${w.nama}</td>
+        <td class="text-center">${d1}</td>
+        <td class="text-center">${d2}</td>
+        <td class="text-center">${d3}</td>
+        <td class="text-center">${d4}</td>
+        <td class="text-center">${d5}</td>
+        <td class="text-center font-weight-bold">${target}</td>
+        <td class="text-center">${bansosTotal}</td>
+        <td class="text-center text-success">${covered}</td>
+        <td class="text-center text-warning">${gap}</td>
+        <td class="text-center text-primary">${leakage}</td>
+        <td class="font-weight-bold">${status}</td>
+    </tr>`);
 
-    document.getElementById('evalTable').innerHTML = tableRows.join('');
+    chartLabels.push(w.nama);
+    chartGap.push(gap);
+    chartCovered.push(covered);
+});
+
 
     // Chart
     const ctx = document.getElementById('evalChart');

@@ -33,7 +33,22 @@
             border-radius: 0 0 30px 30px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-
+        .hero-print { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; padding: 40px 0; margin-bottom: -50px; }
+        .control-panel { background: white; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 25px; position: relative; z-index: 10; }
+        .paper { background: white; width: 210mm; min-height: 297mm; padding: 15mm 20mm; margin: 30px auto; box-shadow: 0 0 20px rgba(0,0,0,0.05); font-family: "Times New Roman", Times, serif; color: #000; }
+        .kop-surat-container { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid #000; padding-bottom: 10px; }
+        .logo-box { width: 85px; flex-shrink: 0; }
+        .logo-kop { width: 100%; height: auto; }
+        .teks-kop { text-align: center; flex-grow: 1; }
+        .kop-line { border-bottom: 1px solid #000; margin-top: 2px; margin-bottom: 20px; }
+        .qr-box { border: 1px solid #eee; padding: 5px; background: #fff; display: inline-block; }
+        @media print {
+            body { background: white !important; }
+            .no-print, header { display: none !important; }
+            .paper { margin: 0 !important; box-shadow: none !important; width: 100% !important; padding: 10mm !important; }
+            @page { size: A4; margin: 0; }
+        }
+        
         /* Cards Styling */
         .card-custom {
             border: none;
@@ -167,6 +182,49 @@
 
 </div>
 
+<div class="paper" id="cetakArea">
+    <div class="kop-surat-container">
+        <div class="logo-box"><img src="assets/img/logo/logo-tksk.png" class="logo-kop"></div>
+        <div class="teks-kop">
+            <h6 style="font-size: 14px; margin: 0;">TENAGA KESEJAHTERAAN SOSIAL KECAMATAN (TKSK)</h6>
+            <h5 class="font-weight-bold" style="font-size: 16px; margin: 2px 0;">FORUM PUSKESOS KECAMATAN SUMBER</h5>
+            <h2 class="font-weight-bold" style="font-size: 26px; margin: 4px 0; letter-spacing: 1px;">DARI DATA KE AKSI</h2>
+            <p class="mb-0" style="font-size: 11px; font-family: Arial;">Sekretariat: Jl. Sunan Drajat No. 16, Kec. Sumber, Kab. Cirebon 45611</p>
+        </div>
+        <div class="logo-box text-right"><img src="assets/img/logo/logo-puskesos.png" class="logo-kop"></div>
+    </div>
+    <div class="kop-line"></div>
+
+    <div class="text-center mb-4">
+        <h5 id="judulLaporan" class="font-weight-bold text-uppercase" style="text-decoration: underline;">MEMPROSES LAPORAN...</h5>
+        <p class="mb-0">Nomor: 460 / <span id="hashNomor">...</span> / TKSK-SBR / 2026</p>
+    </div>
+
+    <div id="kontenData" style="min-height: 500px;">
+        <p class="text-center mt-5">Klik tombol <b>Generate</b> untuk memuat data.</p>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-7">
+            <div style="border: 1px solid #000; padding: 8px; font-size: 10px; font-family: Arial;">
+                <strong>Catatan Verifikasi:</strong><br>
+                - Data Agregat mencakup akumulasi Desil 6 hingga 10.<br>
+                - Daftar Prioritas difilter berdasarkan kode kerentanan D1 dan D2.
+            </div>
+        </div>
+        <div class="col-5 text-center">
+            <p class="mb-1" style="font-size: 14px;">Sumber, <span id="tglSekarang"></span></p>
+            <p class="mb-4 font-weight-bold" style="font-size: 14px;">TKSK Kecamatan Sumber,</p>
+            <div id="qrcode" class="qr-box mb-2"></div>
+            <p class="font-weight-bold mb-0" style="text-decoration: underline; font-size: 15px;">SHIDIQ HASANUDIN, S.IP</p>
+            <small>ID Verif: <span id="hashID">-</span></small>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <script>
 // 1. Muat Navbar (Konsisten dengan Beranda)
 fetch('navbar.html')
@@ -174,6 +232,22 @@ fetch('navbar.html')
     .then(html => {
         document.getElementById('navbar').innerHTML = html;
     });
+
+    let rawData = [];
+    const hashID = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+    // Inisialisasi awal
+    window.onload = () => {
+        document.getElementById('tglSekarang').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+        document.getElementById('hashNomor').innerText = Math.floor(100 + Math.random() * 899);
+        document.getElementById('hashID').innerText = hashID;
+        loadInitialData(); // Load data desa untuk dropdown
+    };
+
+    function toggleWilayah() {
+        const tipe = document.getElementById('tipeLaporan').value;
+        document.getElementById('wilayahContainer').style.display = (tipe === 'perdesa') ? 'block' : 'none';
+    }
     
 let dataJSON = null;
 
@@ -304,6 +378,14 @@ function renderPerDesa() {
 
     document.getElementById('output').innerHTML = html;
 }
+
+   function updateQR(tipe) {
+        document.getElementById('qrcode').innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), {
+            text: `VERIF-TKSK-${tipe.toUpperCase()}-${hashID}`,
+            width: 70, height: 70
+        });
+    }
 </script>
 
 </body>

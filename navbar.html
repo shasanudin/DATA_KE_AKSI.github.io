@@ -44,6 +44,25 @@
       <li class="nav-item"><a class="nav-link" href="wilayah.html">Wilayah</a></li>
       <li class="nav-item"><a class="nav-link" href="berita.html">Berita</a></li>
       <li class="nav-item"><a class="nav-link" href="kontak.html">Kontak</a></li>
+      <li class="nav-item" id="loginNav"></li>
     </ul>
   </div>
+  <script>
+    const loginNav = document.getElementById("loginNav");
+const user = getUser();
+
+if (!user) {
+  loginNav.innerHTML = `<a href="login.html" class="nav-link">Login</a>`;
+} else {
+  loginNav.innerHTML = `
+    <div class="dropdown">
+      <a class="nav-link dropdown-toggle" data-toggle="dropdown">${user.username}</a>
+      <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" href="admin.html">Panel Admin</a>
+        <a class="dropdown-item text-danger" onclick="logout()">Logout</a>
+      </div>
+    </div>
+  `;
+}
+</script>
 </nav>

@@ -226,58 +226,92 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <script>
-// 1. Muat Navbar (Konsisten dengan Beranda)
+// ==============================
+// NAVBAR LOAD
+// ==============================
 fetch('navbar.html')
-    .then(r => r.text())
-    .then(html => {
-        document.getElementById('navbar').innerHTML = html;
-    });
-
-    let rawData = [];
-    const hashID = Math.random().toString(36).substring(2, 8).toUpperCase();
-
-    // Inisialisasi awal
-    window.onload = () => {
-        document.getElementById('tglSekarang').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
-        document.getElementById('hashNomor').innerText = Math.floor(100 + Math.random() * 899);
-        document.getElementById('hashID').innerText = hashID;
-        loadInitialData(); // Load data desa untuk dropdown
-    };
-
-    function toggleWilayah() {
-        const tipe = document.getElementById('tipeLaporan').value;
-        document.getElementById('wilayahContainer').style.display = (tipe === 'perdesa') ? 'block' : 'none';
-    }
-    
-let dataJSON = null;
-
-fetch('data/dtsen.json')
-.then(r => r.json())
-.then(data => {
-    dataJSON = data;
-
-    const select = document.getElementById('desaSelect');
-    data.wilayah.forEach(w => {
-        let opt = document.createElement('option');
-        opt.value = w.nama;
-        opt.textContent = w.nama;
-        select.appendChild(opt);
-    });
+.then(r => r.text())
+.then(html => {
+    document.getElementById('navbar').innerHTML = html;
 });
 
+// ==============================
+// GLOBAL VARIABLES
+// ==============================
+let dataJSON = null;
+const hashID = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+// ==============================
+// INIT ON LOAD
+// ==============================
+window.onload = () => {
+    document.getElementById('tglSekarang').innerText = new Date().toLocaleDateString('id-ID', {
+        day:'numeric', month:'long', year:'numeric'
+    });
+
+    document.getElementById('hashNomor').innerText = Math.floor(100 + Math.random() * 899);
+    document.getElementById('hashID').innerText = hashID;
+
+    loadDTSEN();
+};
+
+// ==============================
+// LOAD DTSEN DATA
+// ==============================
+function loadDTSEN() {
+    fetch('data/dtsen.json')
+    .then(r => r.json())
+    .then(data => {
+        dataJSON = data;
+
+        const select = document.getElementById('desaSelect');
+        select.innerHTML = "";
+
+        data.wilayah.forEach(w => {
+            let opt = document.createElement('option');
+            opt.value = w.nama;
+            opt.textContent = w.nama;
+            select.appendChild(opt);
+        });
+    });
+}
+
+// ==============================
+// MODE CHANGE
+// ==============================
 document.getElementById('mode').addEventListener('change', e => {
     document.getElementById('desaWrap').style.display = (e.target.value === 'desa') ? 'block' : 'none';
 });
 
+// ==============================
+// GENERATE MAIN
+// ==============================
 function generate() {
     const mode = document.getElementById('mode').value;
     if (!dataJSON) return;
 
-    if (mode === 'agregat') renderAgregat();
-    if (mode === 'prioritas') renderPrioritas();
-    if (mode === 'desa') renderPerDesa();
+    if (mode === 'agregat') {
+        renderAgregat();
+        updateQR("AGREGAT");
+        document.getElementById('judulLaporan').innerText = "AGREGASI DATA DTSEN KECAMATAN SUMBER";
+    }
+
+    if (mode === 'prioritas') {
+        renderPrioritas();
+        updateQR("PRIORITAS");
+        document.getElementById('judulLaporan').innerText = "DAFTAR PRIORITAS DTSEN (D1–D2)";
+    }
+
+    if (mode === 'desa') {
+        renderPerDesa();
+        updateQR("DESA");
+        document.getElementById('judulLaporan').innerText = "REKAP DTSEN PER DESA / KELURAHAN";
+    }
 }
 
+// ==============================
+// RENDER AGREGAT
+// ==============================
 function renderAgregat() {
     let totals = Array(10).fill(0);
 
@@ -285,11 +319,11 @@ function renderAgregat() {
         w.desil.forEach((val, i) => totals[i] += val);
     });
 
-    let html = `<h5 class="mb-3 font-weight-bold">Agregasi DTSEN Kecamatan Sumber</h5>`;
+    let html = `<h6 class="font-weight-bold mb-3">Agregasi DTSEN Kecamatan Sumber</h6>`;
 
     const labels = ['D1','D2','D3','D4','D5','D6–D10'];
-
     let rows = '';
+
     for (let i = 0; i < 5; i++) {
         rows += `<tr><td>${labels[i]}</td><td class="text-right">${totals[i]}</td></tr>`;
     }
@@ -297,16 +331,22 @@ function renderAgregat() {
     let d610 = totals.slice(5).reduce((a,b)=>a+b,0);
     rows += `<tr class="font-weight-bold text-primary"><td>D6–D10</td><td class="text-right">${d610}</td></tr>`;
 
-    html += `<table class="table table-bordered table-sm">
-    <thead><tr><th>Kategori</th><th>Total KK</th></tr></thead>
-    <tbody>${rows}</tbody>
+    html += `
+    <table class="table table-bordered table-sm">
+        <thead>
+            <tr><th>Kategori</th><th>Total KK</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
     </table>`;
 
-    document.getElementById('output').innerHTML = html;
+    document.getElementById('kontenData').innerHTML = html;
 }
 
+// ==============================
+// RENDER PRIORITAS D1–D2
+// ==============================
 function renderPrioritas() {
-    let html = `<h5 class="mb-3 font-weight-bold">Daftar Prioritas DTSEN (D1–D2)</h5>`;
+    let html = `<h6 class="font-weight-bold mb-3">Daftar Prioritas DTSEN (D1–D2)</h6>`;
     let rows = '';
     let no = 1;
 
@@ -320,33 +360,36 @@ function renderPrioritas() {
             <td>${w.nama}</td>
             <td class="text-center">${d1}</td>
             <td class="text-center">${d2}</td>
-            <td class="text-center">${d1 + d2}</td>
+            <td class="text-center font-weight-bold">${d1 + d2}</td>
         </tr>`;
     });
 
-    html += `<table class="table table-bordered table-sm">
-    <thead>
-        <tr>
-            <th>No</th>
-            <th>Desa/Kelurahan</th>
-            <th>D1</th>
-            <th>D2</th>
-            <th>Total Prioritas</th>
-        </tr>
-    </thead>
-    <tbody>${rows}</tbody>
+    html += `
+    <table class="table table-bordered table-sm">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Desa/Kelurahan</th>
+                <th>D1</th>
+                <th>D2</th>
+                <th>Total Prioritas</th>
+            </tr>
+        </thead>
+        <tbody>${rows}</tbody>
     </table>`;
 
-    document.getElementById('output').innerHTML = html;
+    document.getElementById('kontenData').innerHTML = html;
 }
 
+// ==============================
+// RENDER PER DESA + PERSENTASE
+// ==============================
 function renderPerDesa() {
     const desa = document.getElementById('desaSelect').value;
     const wilayah = dataJSON.wilayah.find(w => w.nama === desa);
-
     if (!wilayah) return;
 
-    let html = `<h5 class="mb-3 font-weight-bold">Rekap Desa ${desa}</h5>`;
+    let html = `<h6 class="font-weight-bold mb-2">Rekap DTSEN Desa ${desa}</h6>`;
     let total = wilayah.total_kk;
 
     let rows = '';
@@ -361,32 +404,42 @@ function renderPerDesa() {
     let d610 = wilayah.desil.slice(5).reduce((a,b)=>a+b,0);
     let persen610 = ((d610 / total) * 100).toFixed(1);
 
-    rows += `<tr class="font-weight-bold text-primary"><td>D6–D10</td><td class="text-right">${d610}</td><td class="text-right">${persen610}%</td></tr>`;
+    rows += `
+    <tr class="font-weight-bold text-primary">
+        <td>D6–D10</td>
+        <td class="text-right">${d610}</td>
+        <td class="text-right">${persen610}%</td>
+    </tr>`;
 
     html += `
     <p>Total KK: <b>${total}</b></p>
     <table class="table table-bordered table-sm">
-    <thead>
-        <tr>
-            <th>Kategori</th>
-            <th>Jumlah</th>
-            <th>Persentase</th>
-        </tr>
-    </thead>
-    <tbody>${rows}</tbody>
+        <thead>
+            <tr>
+                <th>Kategori</th>
+                <th>Jumlah</th>
+                <th>Persentase</th>
+            </tr>
+        </thead>
+        <tbody>${rows}</tbody>
     </table>`;
 
-    document.getElementById('output').innerHTML = html;
+    document.getElementById('kontenData').innerHTML = html;
 }
 
-   function updateQR(tipe) {
-        document.getElementById('qrcode').innerHTML = "";
-        new QRCode(document.getElementById("qrcode"), {
-            text: `VERIF-TKSK-${tipe.toUpperCase()}-${hashID}`,
-            width: 70, height: 70
-        });
-    }
+// ==============================
+// QR CODE GENERATOR
+// ==============================
+function updateQR(tipe) {
+    document.getElementById('qrcode').innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), {
+        text: `VERIF-TKSK-${tipe}-${hashID}`,
+        width: 70,
+        height: 70
+    });
+}
 </script>
+
 
 </body>
 </html>

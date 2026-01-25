@@ -1,3 +1,10 @@
-{
-  "articles": []
-}
+[
+  {
+    "title": "Langkah 1",
+    "desc": "Mulai pendaftaran DTSEN"
+  },
+  {
+    "title": "Langkah 2",
+    "desc": "Verifikasi data"
+  }
+]

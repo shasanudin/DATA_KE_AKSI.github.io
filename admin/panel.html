@@ -15,3 +15,29 @@ async function load() {
 
 load()
 </script>
+
+<script>
+const TOKEN = "GITHUB_PAT"
+
+async function save() {
+  let file = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`)
+  let info = await file.json()
+
+  let content = btoa(unescape(encodeURIComponent(editor.value)))
+
+  await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `token ${TOKEN}`
+    },
+    body: JSON.stringify({
+      message: "Update alur.json",
+      content: content,
+      sha: info.sha
+    })
+  })
+
+  alert("Alur berhasil disimpan!")
+}
+</script>
+

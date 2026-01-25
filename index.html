@@ -214,6 +214,14 @@
     .then(r => r.text())
     .then(html => { document.getElementById('navbar').innerHTML = html; })
     .catch(err => console.warn("Navbar tidak ditemukan"));
+  <script src="js/auth.js"></script>
+
+
+const user = getUser();
+
+if (user) {
+  console.log("Login sebagai:", user.username, user.role);
+}
 
   // 2. Animasi Typing Judul
   const titleText = "Dari Data ke Aksi";
@@ -236,3 +244,4 @@
 
 </body>
 </html>
+

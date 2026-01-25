@@ -1,29 +1,56 @@
-<h2>Editor Alur DTSEN</h2>
+<h2>Editor Alur DTSEN (Visual)</h2>
 
-<textarea id="editor" style="width:100%;height:300px;"></textarea>
-<button onclick="save()">Simpan</button>
+<div id="list"></div>
+
+<button onclick="addStep()">+ Tambah Langkah</button>
+<button onclick="save()">Simpan ke GitHub</button>
 
 <script>
 const OWNER = "USERNAME_GITHUB"
 const REPO = "REPO_NAME"
 const PATH = "data/alur.json"
+const TOKEN = "GITHUB_PAT"
+
+let steps = []
 
 async function load() {
   let res = await fetch(`https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${PATH}`)
-  editor.value = await res.text()
+  steps = await res.json()
+  render()
 }
 
-load()
-</script>
+function render() {
+  list.innerHTML = ""
+  steps.forEach((step, i) => {
+    list.innerHTML += `
+      <div style="border:1px solid #ccc;padding:10px;margin:10px 0;">
+        <input value="${step.title}" placeholder="Judul" 
+          oninput="steps[${i}].title=this.value"><br><br>
 
-<script>
-const TOKEN = "GITHUB_PAT"
+        <textarea placeholder="Deskripsi"
+          oninput="steps[${i}].desc=this.value">${step.desc}</textarea><br><br>
+
+        <button onclick="removeStep(${i})">Hapus</button>
+      </div>
+    `
+  })
+}
+
+function addStep() {
+  steps.push({ title: "", desc: "" })
+  render()
+}
+
+function removeStep(i) {
+  steps.splice(i, 1)
+  render()
+}
 
 async function save() {
   let file = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`)
   let info = await file.json()
 
-  let content = btoa(unescape(encodeURIComponent(editor.value)))
+  let content = btoa(unescape(encodeURIComponent(JSON.stringify(steps, null, 2))))
 
   await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`, {
     method: "PUT",
@@ -31,13 +58,14 @@ async function save() {
       Authorization: `token ${TOKEN}`
     },
     body: JSON.stringify({
-      message: "Update alur.json",
-      content: content,
+      message: "Update alur.json (visual editor)",
+      content,
       sha: info.sha
     })
   })
 
-  alert("Alur berhasil disimpan!")
+  alert("Alur tersimpan!")
 }
-</script>
 
+load()
+</script>

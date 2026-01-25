@@ -1,0 +1,17 @@
+<h2>Editor Alur DTSEN</h2>
+
+<textarea id="editor" style="width:100%;height:300px;"></textarea>
+<button onclick="save()">Simpan</button>
+
+<script>
+const OWNER = "USERNAME_GITHUB"
+const REPO = "REPO_NAME"
+const PATH = "data/alur.json"
+
+async function load() {
+  let res = await fetch(`https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${PATH}`)
+  editor.value = await res.text()
+}
+
+load()
+</script>

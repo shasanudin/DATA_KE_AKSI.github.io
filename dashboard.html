@@ -80,66 +80,115 @@
     </main>
 
     <script type="module">
-        // Fungsi untuk fetch data JSON
-        async function loadDashboardData() {
-            try {
-                const response = await fetch('data/dtsen.json');
-                const data = await response.json();
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
-                // Update Header
-                document.getElementById('lokasi-info').innerText = `Kec. ${data.kecamatan}, ${data.kabupaten}`;
-                document.getElementById('update-date').innerText = data.updated;
-                document.getElementById('title-wilayah').innerText = `Kecamatan ${data.kecamatan}`;
-                document.getElementById('total-desa').innerText = data.wilayah.length;
+    // 1. Konfigurasi Firebase Anda
+    const firebaseConfig = {
+        apiKey: "AIzaSyAhQvRHBYX7dGW7QiSVN24cukmYHrN6d1c",
+        authDomain: "data-ke-aksi-auth.firebaseapp.com",
+        projectId: "data-ke-aksi-auth",
+        storageBucket: "data-ke-aksi-auth.firebasestorage.app",
+        messagingSenderId: "631382692174",
+        appId: "1:631382692174:web:c10a099fb3021849eace1f"
+    };
 
-                let totalKK = 0;
-                let totalDesil = [0,0,0,0,0,0,0,0,0,0];
-                const tableBody = document.getElementById('table-body');
+    // 2. Inisialisasi
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-                data.wilayah.forEach(w => {
-                    totalKK += w.total_kk;
-                    
-                    // Hitung total desil untuk grafik
-                    w.desil.forEach((val, idx) => { totalDesil[idx] += val; });
-
-                    // Isi Tabel
-                    const row = `<tr>
-                        <td>${w.kode}</td>
-                        <td><strong>${w.nama}</strong></td>
-                        <td>${w.jenis}</td>
-                        <td>${w.total_kk.toLocaleString()}</td>
-                        <td><button class="btn-sm">Detail</button></td>
-                    </tr>`;
-                    tableBody.innerHTML += row;
-                });
-
-                document.getElementById('total-kk-wilayah').innerText = totalKK.toLocaleString();
-
-                // Render Chart
-                renderChart(totalDesil);
-
-            } catch (err) {
-                console.error("Gagal memuat data:", err);
-            }
+    // 3. Proteksi Halaman & Load Data
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("User terverifikasi:", user.email);
+            loadDashboardFromFirestore();
+        } else {
+            // Jika tidak login, tendang ke halaman login
+            window.location.href = "index.html";
         }
+    });
 
-        function renderChart(dataDesil) {
-            const ctx = document.getElementById('chartDesil').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10'],
-                    datasets: [{
-                        label: 'Jumlah KK',
-                        data: dataDesil,
-                        backgroundColor: '#007bff'
-                    }]
-                },
-                options: { responsive: true }
+    // 4. Fungsi Ambil Data dari Firestore
+    async function loadDashboardFromFirestore() {
+        try {
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Memuat data...</td></tr>";
+            
+            let totalKK = 0;
+            let totalDesil = Array(10).fill(0);
+            let countDesa = 0;
+
+            // Ambil koleksi 'wilayah_desa' diurutkan berdasarkan nama
+            const q = query(collection(db, "wilayah_desa"), orderBy("nama", "asc"));
+            const querySnapshot = await getDocs(q);
+            
+            tableBody.innerHTML = ""; // Bersihkan loading
+
+            querySnapshot.forEach((doc) => {
+                const w = doc.data();
+                countDesa++;
+                totalKK += w.total_kk;
+                
+                // Akumulasi Desil untuk Grafik
+                if (w.desil && Array.isArray(w.desil)) {
+                    w.desil.forEach((val, idx) => { totalDesil[idx] += (val || 0); });
+                }
+
+                const row = `<tr>
+                    <td>${w.kode}</td>
+                    <td><strong>${w.nama}</strong></td>
+                    <td>${w.jenis}</td>
+                    <td>${w.total_kk.toLocaleString()}</td>
+                    <td><button class="btn-sm" onclick="alert('ID: ${doc.id}')">Detail</button></td>
+                </tr>`;
+                tableBody.innerHTML += row;
             });
-        }
 
-        loadDashboardData();
-    </script>
+            // Update UI Ringkasan
+            document.getElementById('total-kk-wilayah').innerText = totalKK.toLocaleString();
+            document.getElementById('total-desa').innerText = countDesa;
+            document.getElementById('update-date').innerText = new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+
+            // Render Grafik
+            renderChart(totalDesil);
+
+        } catch (err) {
+            console.error("Error Firestore:", err);
+            document.getElementById('table-body').innerHTML = `<tr><td colspan='5' style='color:red;'>Error: ${err.message}</td></tr>`;
+        }
+    }
+
+    function renderChart(dataDesil) {
+        const ctx = document.getElementById('chartDesil').getContext('2d');
+        // Hapus chart lama jika ada (mencegah tumpang tindih)
+        if (window.myChart) window.myChart.destroy();
+        
+        window.myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10'],
+                datasets: [{
+                    label: 'Total KK per Desil',
+                    data: dataDesil,
+                    backgroundColor: '#007bff',
+                    borderRadius: 5
+                }]
+            },
+            options: { 
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    // 5. Fungsi Logout
+    window.logout = function() {
+        signOut(auth).then(() => {
+            window.location.href = "index.html";
+        });
+    }
+</script>
 </body>
 </html>

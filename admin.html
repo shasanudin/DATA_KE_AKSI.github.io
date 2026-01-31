@@ -3,23 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - My Project</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Login - DATA KE AKSI</title>
+    <link rel="stylesheet" href="css/style login.css">
 </head>
 <body>
     <div class="login-container">
+        <header>
+            <h2 style="font-size: 1.2rem; border-bottom: 2px solid #007bff; padding-bottom: 10px; display: inline-block;">DATA KE AKSI</h2>
+            <p style="color: #666; font-size: 0.9rem; margin: 15px 0;">Silakan masuk untuk akses dashboard</p>
+        </header>
+        
         <form id="loginForm">
-            <h2>Selamat Datang</h2>
             <div class="input-group">
                 <input type="text" id="username" placeholder="Username" required>
             </div>
             <div class="input-group">
                 <input type="password" id="password" placeholder="Password" required>
             </div>
-            <button type="submit">Login</button>
+            <button type="submit">MASUK</button>
             <p id="message"></p>
         </form>
     </div>
-    <script src="js/script.js"></script>
+
+    <script src="js/script login.js"></script>
 </body>
 </html>

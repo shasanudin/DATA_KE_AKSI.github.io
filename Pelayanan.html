@@ -211,7 +211,7 @@
     async function fetchLayanan() {
         try {
             // Mengambil dari koleksi "pelayanan_desa"
-            const q = query(collection(db, "pelayanan_desa"), orderBy("tanggal", "desc"), limit(50));
+            const q = query(collection(db, "pelayanan"), orderBy("tanggal", "desc"), limit(50));
             const querySnapshot = await getDocs(q);
             
             const tbody = document.getElementById('tabelLayanan');

@@ -6,20 +6,20 @@
     <title>Dashboard - DATA KE AKSI</title>
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="dashboard-body">
 
     <aside class="sidebar">
         <div class="sidebar-header">
             <h3>DATA KE AKSI</h3>
+            <small id="lokasi-info">Kec. Sumber, Cirebon</small>
         </div>
         <nav class="sidebar-nav">
             <ul>
                 <li class="active"><a href="#"><i class="fas fa-home"></i> Beranda</a></li>
-                <li><a href="#"><i class="fas fa-database"></i> Input Data</a></li>
-                <li><a href="#"><i class="fas fa-chart-line"></i> Statistik</a></li>
-                <li><a href="#"><i class="fas fa-file-export"></i> Laporan</a></li>
-                <li><a href="#"><i class="fas fa-cog"></i> Pengaturan</a></li>
+                <li><a href="admin/input_data.html"><i class="fas fa-edit"></i> Input Data Baru</a></li>
+                <li><a href="#"><i class="fas fa-chart-bar"></i> Statistik Desil</a></li>
                 <li class="logout-item"><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Keluar</a></li>
             </ul>
         </nav>
@@ -28,125 +28,118 @@
     <main class="main-content">
         <header class="top-nav">
             <div class="user-profile">
-                <span>Selamat Datang, <strong>Administrator</strong></span>
+                <span>Update: <strong id="update-date">-</strong></span>
             </div>
         </header>
 
         <section class="content-header">
-            <h1>Ringkasan Data</h1>
-            <p>Pantau perkembangan data aksi secara real-time.</p>
+            <h1 id="title-wilayah">Data Kecamatan</h1>
+            <p>Distribusi Kesejahteraan Keluarga Berdasarkan Desil.</p>
         </section>
 
         <section class="stats-grid">
             <div class="card">
-                <i class="fas fa-users icon-blue"></i>
                 <div class="card-info">
-                    <h3>1,254</h3>
-                    <p>Total Responden</p>
+                    <h3 id="total-kk-wilayah">0</h3>
+                    <p>Total KK Terdata</p>
                 </div>
             </div>
             <div class="card">
-                <i class="fas fa-check-circle icon-green"></i>
                 <div class="card-info">
-                    <h3>85%</h3>
-                    <p>Data Tervalidasi</p>
+                    <h3 id="total-desa">0</h3>
+                    <p>Kelurahan/Desa</p>
                 </div>
             </div>
-            <div class="card">
-                <i class="fas fa-tasks icon-orange"></i>
-                <div class="card-info">
-                    <h3>42</h3>
-                    <p>Aksi Berjalan</p>
-                </div>
+        </section>
+
+        <section class="data-section" style="margin-bottom: 2rem;">
+            <div class="table-container">
+                <h3>Grafik Total Desil Kecamatan</h3>
+                <canvas id="chartDesil" height="100"></canvas>
             </div>
         </section>
 
         <section class="data-section">
             <div class="table-container">
-                <h3>Aktivitas Terbaru</h3>
+                <h3>Rincian Per Wilayah</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>Tanggal</th>
-                            <th>Kategori</th>
-                            <th>Status</th>
+                            <th>Kode</th>
+                            <th>Nama Kelurahan/Desa</th>
+                            <th>Jenis</th>
+                            <th>Total KK</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>31 Jan 2026</td>
-                            <td>Kesehatan</td>
-                            <td><span class="badge success">Selesai</span></td>
-                        </tr>
-                        <tr>
-                            <td>30 Jan 2026</td>
-                            <td>Pendidikan</td>
-                            <td><span class="badge warning">Proses</span></td>
-                        </tr>
-                    </tbody>
+                    <tbody id="table-body">
+                        </tbody>
                 </table>
             </div>
         </section>
     </main>
 
-    <script>
-        function logout() {
-            // Logika logout
-            window.location.href = "index.html";
-        }
-    </script>
     <script type="module">
-  // 1. Import library yang dibutuhkan
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // Fungsi untuk fetch data JSON
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('dtsen.json');
+                const data = await response.json();
 
-  // 2. Konfigurasi Firebase kamu
-  const firebaseConfig = {
-    apiKey: "AIzaSyAhQvRHBYX7dGW7QiSVN24cukmYHrN6d1c",
-    authDomain: "data-ke-aksi-auth.firebaseapp.com",
-    projectId: "data-ke-aksi-auth",
-    storageBucket: "data-ke-aksi-auth.firebasestorage.app",
-    messagingSenderId: "631382692174",
-    appId: "1:631382692174:web:c10a099fb3021849eace1f",
-    measurementId: "G-9NMBBB79EQ"
-  };
+                // Update Header
+                document.getElementById('lokasi-info').innerText = `Kec. ${data.kecamatan}, ${data.kabupaten}`;
+                document.getElementById('update-date').innerText = data.updated;
+                document.getElementById('title-wilayah').innerText = `Kecamatan ${data.kecamatan}`;
+                document.getElementById('total-desa').innerText = data.wilayah.length;
 
-  // 3. Inisialisasi Firebase & Auth
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+                let totalKK = 0;
+                let totalDesil = [0,0,0,0,0,0,0,0,0,0];
+                const tableBody = document.getElementById('table-body');
 
-  // 4. Logika Login
-  const loginForm = document.getElementById('loginForm');
-  const message = document.getElementById('message');
+                data.wilayah.forEach(w => {
+                    totalKK += w.total_kk;
+                    
+                    // Hitung total desil untuk grafik
+                    w.desil.forEach((val, idx) => { totalDesil[idx] += val; });
 
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // Ambil input (Ingat: Firebase Auth butuh Email, bukan sekadar username biasa)
-    const email = document.getElementById('username').value; 
-    const pass = document.getElementById('password').value;
+                    // Isi Tabel
+                    const row = `<tr>
+                        <td>${w.kode}</td>
+                        <td><strong>${w.nama}</strong></td>
+                        <td>${w.jenis}</td>
+                        <td>${w.total_kk.toLocaleString()}</td>
+                        <td><button class="btn-sm">Detail</button></td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
 
-    signInWithEmailAndPassword(auth, email, pass)
-      .then((userCredential) => {
-        // Berhasil login
-        message.style.color = "#28a745";
-        message.innerText = "Login Berhasil! Mengalihkan...";
-        
-        setTimeout(() => {
-          window.location.href = "dashboard.html";
-        }, 1200);
-      })
-      .catch((error) => {
-        // Gagal login
-        message.style.color = "#dc3545";
-        // Pesan error lebih ramah pengguna
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-            message.innerText = "Email atau Password salah!";
-        } else {
-            message.innerText = "Terjadi kesalahan: " + error.message;
+                document.getElementById('total-kk-wilayah').innerText = totalKK.toLocaleString();
+
+                // Render Chart
+                renderChart(totalDesil);
+
+            } catch (err) {
+                console.error("Gagal memuat data:", err);
+            }
         }
-      });
-  });
-</script>
+
+        function renderChart(dataDesil) {
+            const ctx = document.getElementById('chartDesil').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10'],
+                    datasets: [{
+                        label: 'Jumlah KK',
+                        data: dataDesil,
+                        backgroundColor: '#007bff'
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+
+        loadDashboardData();
+    </script>
 </body>
 </html>

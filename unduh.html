@@ -174,65 +174,7 @@
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="js/unduh.js"></script>
 
-<script>
-// Logika JS Anda tetap sama seperti sebelumnya, pastikan dataJSON terisi.
-// ... (Script generate, renderAgregat, renderPrioritas, dll sesuai kode asli Anda) ...
-
-// Tambahan sedikit agar ID Hash tidak berubah saat tombol print ditekan (opsional)
-let dataJSON = null;
-const hashID = Math.random().toString(36).substring(2, 8).toUpperCase();
-
-window.onload = () => {
-    document.getElementById('tglSekarang').innerText = new Date().toLocaleDateString('id-ID', {
-        day:'numeric', month:'long', year:'numeric'
-    });
-    document.getElementById('hashNomor').innerText = Math.floor(100 + Math.random() * 899);
-    document.getElementById('hashID').innerText = hashID;
-    loadDTSEN();
-};
-
-function loadDTSEN() {
-    // Simulasi Fetch atau ganti dengan path file JSON Anda
-    fetch('data/dtsen.json')
-    .then(r => r.json())
-    .then(data => {
-        dataJSON = data;
-        const select = document.getElementById('desaSelect');
-        data.wilayah.forEach(w => {
-            let opt = document.createElement('option');
-            opt.value = w.nama;
-            opt.textContent = w.nama;
-            select.appendChild(opt);
-        });
-    }).catch(err => console.log("Gagal memuat data JSON"));
-}
-
-document.getElementById('mode').addEventListener('change', e => {
-    document.getElementById('desaWrap').style.display = (e.target.value === 'desa') ? 'block' : 'none';
-});
-
-function generate() {
-    const mode = document.getElementById('mode').value;
-    if (!dataJSON) { alert("Data belum siap!"); return; }
-
-    if (mode === 'agregat') {
-        renderAgregat();
-        updateQR("AGREGAT");
-        document.getElementById('judulLaporan').innerText = "AGREGASI DATA DTSEN KECAMATAN SUMBER";
-    } else if (mode === 'prioritas') {
-        renderPrioritas();
-        updateQR("PRIORITAS");
-        document.getElementById('judulLaporan').innerText = "DAFTAR PRIORITAS DTSEN (D1–D2)";
-    } else if (mode === 'desa') {
-        renderPerDesa();
-        updateQR("DESA");
-        document.getElementById('judulLaporan').innerText = "REKAP DTSEN PER DESA / KELURAHAN";
-    }
-}
-
-// Fungsi render lainnya (renderAgregat, renderPrioritas, renderPerDesa, updateQR) 
-// tetap sama seperti kode Anda sebelumnya.
-</script>
 </body>
 </html>

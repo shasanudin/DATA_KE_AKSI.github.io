@@ -245,3 +245,15 @@ body.dashboard-body {
     .grid-3 { grid-template-columns: 1fr; }
     .desil-inputs { grid-template-columns: repeat(2, 1fr); }
 }
+
+.chart-full { 
+    width: 100%; 
+    max-width: 1000px; 
+    height: 400px; /* Tambahkan tinggi tetap ini */
+    background: white; 
+    padding: 25px; 
+    border-radius: 12px; 
+    box-shadow: var(--shadow); 
+    margin-bottom: 20px; 
+    position: relative; /* Penting untuk Chart.js */
+}

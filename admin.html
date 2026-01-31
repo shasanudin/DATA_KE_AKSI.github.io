@@ -49,5 +49,58 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
 </script>
+<script type="module">
+  // 1. Import library yang dibutuhkan
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  // 2. Konfigurasi Firebase kamu
+  const firebaseConfig = {
+    apiKey: "AIzaSyAhQvRHBYX7dGW7QiSVN24cukmYHrN6d1c",
+    authDomain: "data-ke-aksi-auth.firebaseapp.com",
+    projectId: "data-ke-aksi-auth",
+    storageBucket: "data-ke-aksi-auth.firebasestorage.app",
+    messagingSenderId: "631382692174",
+    appId: "1:631382692174:web:c10a099fb3021849eace1f",
+    measurementId: "G-9NMBBB79EQ"
+  };
+
+  // 3. Inisialisasi Firebase & Auth
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // 4. Logika Login
+  const loginForm = document.getElementById('loginForm');
+  const message = document.getElementById('message');
+
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    // Ambil input (Ingat: Firebase Auth butuh Email, bukan sekadar username biasa)
+    const email = document.getElementById('username').value; 
+    const pass = document.getElementById('password').value;
+
+    signInWithEmailAndPassword(auth, email, pass)
+      .then((userCredential) => {
+        // Berhasil login
+        message.style.color = "#28a745";
+        message.innerText = "Login Berhasil! Mengalihkan...";
+        
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 1200);
+      })
+      .catch((error) => {
+        // Gagal login
+        message.style.color = "#dc3545";
+        // Pesan error lebih ramah pengguna
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+            message.innerText = "Email atau Password salah!";
+        } else {
+            message.innerText = "Terjadi kesalahan: " + error.message;
+        }
+      });
+  });
+</script>
 </body>
 </html>

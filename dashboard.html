@@ -96,11 +96,12 @@
     </main>
 
     <script type="module">
+    // 1. IMPORT (Hanya sekali di paling atas)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
-    // 1. Konfigurasi Firebase Anda
+    // 2. KONFIGURASI
     const firebaseConfig = {
         apiKey: "AIzaSyAhQvRHBYX7dGW7QiSVN24cukmYHrN6d1c",
         authDomain: "data-ke-aksi-auth.firebaseapp.com",
@@ -110,103 +111,12 @@
         appId: "1:631382692174:web:c10a099fb3021849eace1f"
     };
 
-    // 2. Inisialisasi
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // 3. Proteksi Halaman & Load Data
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("User terverifikasi:", user.email);
-            loadDashboardFromFirestore();
-        } else {
-            // Jika tidak login, tendang ke halaman login
-            window.location.href = "index.html";
-        }
-    });
-
-    // 4. Fungsi Ambil Data dari Firestore
+    // 3. FUNGSI UTAMA (Hanya deklarasikan SATU KALI)
     async function loadDashboardFromFirestore() {
-        try {
-            const tableBody = document.getElementById('table-body');
-            tableBody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Memuat data...</td></tr>";
-            
-            let totalKK = 0;
-            let totalDesil = Array(10).fill(0);
-            let countDesa = 0;
-
-            // Ambil koleksi 'wilayah_desa' diurutkan berdasarkan nama
-            const q = query(collection(db, "wilayah_desa"), orderBy("nama", "asc"));
-            const querySnapshot = await getDocs(q);
-            
-            tableBody.innerHTML = ""; // Bersihkan loading
-
-            querySnapshot.forEach((doc) => {
-                const w = doc.data();
-                countDesa++;
-                totalKK += w.total_kk;
-                
-                // Akumulasi Desil untuk Grafik
-                if (w.desil && Array.isArray(w.desil)) {
-                    w.desil.forEach((val, idx) => { totalDesil[idx] += (val || 0); });
-                }
-
-                const row = `<tr>
-                    <td>${w.kode}</td>
-                    <td><strong>${w.nama}</strong></td>
-                    <td>${w.jenis}</td>
-                    <td>${w.total_kk.toLocaleString()}</td>
-                    <td><button class="btn-sm" onclick="alert('ID: ${doc.id}')">Detail</button></td>
-                </tr>`;
-                tableBody.innerHTML += row;
-            });
-
-            // Update UI Ringkasan
-            document.getElementById('total-kk-wilayah').innerText = totalKK.toLocaleString();
-            document.getElementById('total-desa').innerText = countDesa;
-            document.getElementById('update-date').innerText = new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
-
-            // Render Grafik
-            renderChart(totalDesil);
-
-        } catch (err) {
-            console.error("Error Firestore:", err);
-            document.getElementById('table-body').innerHTML = `<tr><td colspan='5' style='color:red;'>Error: ${err.message}</td></tr>`;
-        }
-    }
-
-    function renderChart(dataDesil) {
-        const ctx = document.getElementById('chartDesil').getContext('2d');
-        // Hapus chart lama jika ada (mencegah tumpang tindih)
-        if (window.myChart) window.myChart.destroy();
-        
-        window.myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10'],
-                datasets: [{
-                    label: 'Total KK per Desil',
-                    data: dataDesil,
-                    backgroundColor: '#007bff',
-                    borderRadius: 5
-                }]
-            },
-            options: { 
-                responsive: true,
-                scales: { y: { beginAtZero: true } }
-            }
-        });
-    }
-
-    // 5. Fungsi Logout
-    window.logout = function() {
-        signOut(auth).then(() => {
-            window.location.href = "index.html";
-        });
-    }
-
-        async function loadDashboardFromFirestore() {
         try {
             const q = query(collection(db, "wilayah_desa"), orderBy("nama", "asc"));
             const querySnapshot = await getDocs(q);
@@ -225,17 +135,14 @@
                 countDesa++;
                 totalKK += (w.total_kk || 0);
 
-                // Hitung Akumulasi Desil
-                if(w.desil) w.desil.forEach((val, i) => totalDesil[i] += val);
+                if(w.desil) w.desil.forEach((val, i) => { totalDesil[i] += val; });
 
-                // Hitung Akumulasi Bansos
                 if(w.bansos) {
                     totalBansos.bpnt += (w.bansos.bpnt || 0);
                     totalBansos.pkh += (w.bansos.pkh || 0);
                     totalBansos.pbi += (w.bansos.pbi || 0);
                 }
 
-                // Hitung Akumulasi Layanan
                 if(w.layanan) {
                     totalLayanan.pengaduan += (w.layanan.pengaduan || 0);
                     totalLayanan.sktm += (w.layanan.sktm || 0);
@@ -251,18 +158,25 @@
                 </tr>`;
             });
 
-            // Update Header Stats
             document.getElementById('total-kk-wilayah').innerText = totalKK.toLocaleString();
             document.getElementById('total-desa').innerText = countDesa;
 
-            // Render Semua Grafik
             renderAllCharts(totalDesil, totalBansos, totalLayanan);
-
-        } catch (err) { console.error(err); }
+        } catch (err) {
+            console.error("Gagal memuat data:", err);
+        }
     }
 
+    // 4. FUNGSI RENDER CHART
     function renderAllCharts(desil, bansos, layanan) {
-        // 1. Grafik Desil (Bar)
+        // Hapus chart lama agar tidak tumpang tindih saat reload
+        const ids = ['chartDesil', 'chartBansos', 'chartLayanan'];
+        ids.forEach(id => {
+            const chartStatus = Chart.getChart(id);
+            if (chartStatus) chartStatus.destroy();
+        });
+
+        // Grafik Bar Desil
         new Chart(document.getElementById('chartDesil'), {
             type: 'bar',
             data: {
@@ -271,8 +185,7 @@
             }
         });
 
-        // 2. Grafik Bansos (Doughnut/Pie) - Lebih enak dilihat untuk proporsi
-        
+        // Grafik Doughnut Bansos
         new Chart(document.getElementById('chartBansos'), {
             type: 'doughnut',
             data: {
@@ -281,14 +194,13 @@
                     data: [bansos.bpnt, bansos.pkh, bansos.pbi],
                     backgroundColor: ['#ffc107', '#28a745', '#17a2b8']
                 }]
-            },
-            options: { plugins: { legend: { position: 'bottom' } } }
+            }
         });
 
-        // 3. Grafik Layanan (Horizontal Bar)
+        // Grafik Horizontal Bar Layanan
         new Chart(document.getElementById('chartLayanan'), {
-            type: 'index',
-            indexAxis: 'y', // Membuat bar horizontal
+            type: 'bar',
+            options: { indexAxis: 'y' },
             data: {
                 labels: ['Pengaduan', 'SKTM', 'Update DTKS'],
                 datasets: [{
@@ -300,7 +212,18 @@
         });
     }
 
-    loadDashboardFromFirestore();
+    // 5. EKSEKUSI & PROTEKSI
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            loadDashboardFromFirestore();
+        } else {
+            window.location.href = "index.html";
+        }
+    });
+
+    window.logout = function() {
+        signOut(auth).then(() => { window.location.href = "index.html"; });
+    }
 </script>
 </body>
 </html>

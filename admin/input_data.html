@@ -29,13 +29,15 @@
         </section>
 
         <section class="data-section">
-            <div class="table-container">
-                <form id="formInputData">
-                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="input-group">
-                            <label>Kode Wilayah (BPS)</label>
-                            <input type="text" id="kode" placeholder="Contoh: 320903..." required>
-                        </div>
+        <div class="form-container">
+            <form id="formInputData">
+                <h3 class="form-section-title">Informasi Wilayah</h3>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Kode Wilayah (BPS)</label>
+                        <input type="text" id="kode" placeholder="Masukkan 10 digit kode" required>
+                    </div>
+                </div>
                         <div class="input-group">
                             <label>Nama Kelurahan/Desa</label>
                             <input type="text" id="nama" placeholder="Nama Wilayah" required>
@@ -67,10 +69,14 @@
                         <input type="number" id="d10" placeholder="D10" required>
                     </div>
 
-                    <button type="submit" class="btn-primary" style="margin-top: 2rem; width: auto; padding: 12px 40px;">SIMPAN DATA</button>
-                </form>
+                    <div class="btn-submit-container">
+                        <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i> SIMPAN KE DATABASE
+                </button>
             </div>
-        </section>
+        </form>
+    </div>
+</section>
     </main>
 
     <script type="module">

@@ -15,119 +15,123 @@
         </div>
         <nav class="sidebar-nav">
             <ul>
-                <li><a href="dashboard.html"><i class="fas fa-home"></i> Beranda</a></li>
+                <li><a href="https://shasanudin.github.io/DATA_KE_AKSI/dashboard.html"><i class="fas fa-home"></i> Beranda</a></li>
                 <li class="active"><a href="#"><i class="fas fa-edit"></i> Input Data Baru</a></li>
-                <li class="logout-item"><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Keluar</a></li>
+                <li class="logout-item"><a href="https://shasanudin.github.io/DATA_KE_AKSI/index.html" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Keluar</a></li>
             </ul>
         </nav>
     </aside>
 
     <main class="main-content">
         <section class="content-header">
-            <h1>Form Input Wilayah</h1>
-            <p>Tambahkan data Kelurahan/Desa baru ke dalam database sistem.</p>
+            <h1>Form Input Data Wilayah</h1>
         </section>
 
-        <section class="data-section">
         <div class="form-container">
             <form id="formInputData">
                 <h3 class="form-section-title">Informasi Wilayah</h3>
                 <div class="form-grid">
                     <div class="input-group">
-                        <label>Kode Wilayah (BPS)</label>
-                        <input type="text" id="kode" placeholder="Masukkan 10 digit kode" required>
+                        <label>Kode Wilayah</label>
+                        <input type="text" id="kode" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Nama Kelurahan/Desa</label>
+                        <input type="text" id="nama" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Jenis</label>
+                        <select id="jenis">
+                            <option value="Kelurahan">Kelurahan</option>
+                            <option value="Desa">Desa</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Total KK (Otomatis)</label>
+                        <input type="number" id="total_kk" readonly style="background:#eee;">
                     </div>
                 </div>
-                        <div class="input-group">
-                            <label>Nama Kelurahan/Desa</label>
-                            <input type="text" id="nama" placeholder="Nama Wilayah" required>
-                        </div>
-                        <div class="input-group">
-                            <label>Jenis Wilayah</label>
-                            <select id="jenis" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd;">
-                                <option value="Kelurahan">Kelurahan</option>
-                                <option value="Desa">Desa</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label>Total KK</label>
-                            <input type="number" id="total_kk" placeholder="Jumlah KK" required>
-                        </div>
-                    </div>
 
-                    <h3 style="margin-top: 2rem; border-bottom: 1px solid #eee; padding-bottom: 10px;">Data Desil (1-10)</h3>
-                    <div class="desil-inputs" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 1rem;">
-                        <input type="number" id="d1" placeholder="D1" required>
-                        <input type="number" id="d2" placeholder="D2" required>
-                        <input type="number" id="d3" placeholder="D3" required>
-                        <input type="number" id="d4" placeholder="D4" required>
-                        <input type="number" id="d5" placeholder="D5" required>
-                        <input type="number" id="d6" placeholder="D6" required>
-                        <input type="number" id="d7" placeholder="D7" required>
-                        <input type="number" id="d8" placeholder="D8" required>
-                        <input type="number" id="d9" placeholder="D9" required>
-                        <input type="number" id="d10" placeholder="D10" required>
+                <h3 class="form-section-title">Data Desil</h3>
+                <div class="desil-container">
+                    <div class="desil-inputs" id="desilWrapper">
+                        <div class="desil-item"><label>D1</label><input type="number" class="val-desil" value="0"></div>
+                        <div class="desil-item"><label>D2</label><input type="number" class="val-desil" value="0"></div>
+                        <div class="desil-item"><label>D3</label><input type="number" class="val-desil" value="0"></div>
+                        <div class="desil-item"><label>D4</label><input type="number" class="val-desil" value="0"></div>
+                        <div class="desil-item"><label>D5</label><input type="number" class="val-desil" value="0"></div>
+                        <div class="desil-item"><label>D6</label><input type="number" class="val-desil" value="0"></div>
+                        <div class="desil-item"><label>D7</label><input type="number" class="val-desil" value="0"></div>
+                        <div class="desil-item"><label>D8</label><input type="number" class="val-desil" value="0"></div>
+                        <div class="desil-item"><label>D9</label><input type="number" class="val-desil" value="0"></div>
+                        <div class="desil-item"><label>D10</label><input type="number" class="val-desil" value="0"></div>
                     </div>
+                </div>
 
-                    <div class="btn-submit-container">
-                        <button type="submit" class="btn-primary">
-                    <i class="fas fa-save"></i> SIMPAN KE DATABASE
-                </button>
-            </div>
-        </form>
-    </div>
-</section>
+                <div class="btn-submit-container">
+                    <p id="message" style="margin-right:20px;"></p>
+                    <button type="submit" class="btn-primary" id="btnSimpan">SIMPAN DATA</button>
+                </div>
+            </form>
+        </div>
     </main>
 
     <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAhQvRHBYX7dGW7QiSVN24cukmYHrN6d1c",
+            authDomain: "data-ke-aksi-auth.firebaseapp.com",
+            projectId: "data-ke-aksi-auth",
+            storageBucket: "data-ke-aksi-auth.firebasestorage.app",
+            messagingSenderId: "631382692174",
+            appId: "1:631382692174:web:c10a099fb3021849eace1f"
+        };
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAhQvRHBYX7dGW7QiSVN24cukmYHrN6d1c",
-    authDomain: "data-ke-aksi-auth.firebaseapp.com",
-    projectId: "data-ke-aksi-auth",
-    storageBucket: "data-ke-aksi-auth.firebasestorage.app",
-    messagingSenderId: "631382692174",
-    appId: "1:631382692174:web:c10a099fb3021849eace1f"
-  };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+        // Logika Hitung Otomatis
+        const inputs = document.querySelectorAll('.val-desil');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                let total = 0;
+                inputs.forEach(i => total += parseInt(i.value) || 0);
+                document.getElementById('total_kk').value = total;
+            });
+        });
 
-  document.getElementById('formInputData').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const submitBtn = e.target.querySelector('button');
-    submitBtn.innerText = "MENYIMPAN...";
-    submitBtn.disabled = true;
+        // Submit ke Firestore
+        document.getElementById('formInputData').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSimpan');
+            const msg = document.getElementById('message');
+            
+            btn.disabled = true;
+            btn.innerText = "Menyimpan...";
 
-    try {
-      // Mengambil data dari form
-      await addDoc(collection(db, "wilayah_desa"), {
-        kode: document.getElementById('kode').value,
-        nama: document.getElementById('nama').value,
-        jenis: document.getElementById('jenis').value,
-        total_kk: parseInt(document.getElementById('total_kk').value),
-        desil: [
-          parseInt(document.getElementById('d1').value), parseInt(document.getElementById('d2').value),
-          parseInt(document.getElementById('d3').value), parseInt(document.getElementById('d4').value),
-          parseInt(document.getElementById('d5').value), parseInt(document.getElementById('d6').value),
-          parseInt(document.getElementById('d7').value), parseInt(document.getElementById('d8').value),
-          parseInt(document.getElementById('d9').value), parseInt(document.getElementById('d10').value)
-        ],
-        createdAt: serverTimestamp()
-      });
-
-      alert("Data Berhasil Disimpan ke Firestore!");
-      e.target.reset();
-    } catch (error) {
-      console.error("Error adding document: ", error);
-      alert("Gagal menyimpan data.");
-    } finally {
-      submitBtn.innerText = "SIMPAN DATA";
-      submitBtn.disabled = false;
-    }
-  });
-</script>
+            try {
+                const desilValues = Array.from(inputs).map(i => parseInt(i.value) || 0);
+                await addDoc(collection(db, "wilayah_desa"), {
+                    kode: document.getElementById('kode').value,
+                    nama: document.getElementById('nama').value,
+                    jenis: document.getElementById('jenis').value,
+                    total_kk: parseInt(document.getElementById('total_kk').value),
+                    desil: desilValues,
+                    timestamp: new Date()
+                });
+                msg.innerText = "Berhasil disimpan!";
+                msg.style.color = "green";
+                e.target.reset();
+            } catch (err) {
+                msg.innerText = "Error: " + err.message;
+                msg.style.color = "red";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "SIMPAN DATA";
+            }
+        });
+    </script>
 </body>
 </html>

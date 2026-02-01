@@ -1,1 +1,8 @@
-[]
+{
+    "title": "Judul Jurnal Baru",
+    "date": "2026-02-10",
+    "source": "Nama Penulis",
+    "priority": "normal",
+    "kesimpulan": "Tuliskan ringkasan 1-2 kalimat di sini.",
+    "content": "Tuliskan narasi lengkapnya di sini..."
+}

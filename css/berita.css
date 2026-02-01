@@ -1,0 +1,90 @@
+        :root {
+            --primary: #007bff;
+            --secondary: #0056b3;
+            --dark: #212529;
+            --jurnal-bg: #ffffff;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: #f4f7f6; color: #333; }
+        
+        /* Header Hero */
+        .hero-mini { 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); 
+            color: white; 
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+
+        /* Jurnal Style Card */
+        .jurnal-card {
+            background: var(--jurnal-bg);
+            border: none;
+            border-top: 5px solid var(--primary);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .jurnal-header {
+            padding: 30px 40px 10px 40px;
+            text-align: center;
+        }
+
+        .jurnal-title {
+            font-family: 'Lora', serif;
+            font-weight: 700;
+            color: #1a1a1a;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .jurnal-meta {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .jurnal-body {
+            padding: 0 40px 40px 40px;
+        }
+
+        /* Abstract / Kesimpulan Style */
+        .kesimpulan-box {
+            background: #f9f9f9;
+            padding: 20px;
+            border-left: 4px solid #ddd;
+            font-style: italic;
+            margin-bottom: 25px;
+        }
+
+        .jurnal-content {
+            font-family: 'Lora', serif;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            text-align: justify;
+            /* Membuat efek dua kolom pada layar besar */
+            column-count: 1;
+            column-gap: 40px;
+        }
+
+        @media (min-width: 992px) {
+            .jurnal-content { column-count: 2; }
+        }
+
+        .badge-priority {
+            background: #ff4757;
+            color: white;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            vertical-align: middle;
+        }
+
+        footer { background: var(--dark); color: white; padding: 40px 0; margin-top: 50px; }
